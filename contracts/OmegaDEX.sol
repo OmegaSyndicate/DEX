@@ -229,16 +229,21 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         emit LiquidityRemoved(msg.sender, outputToken, actualOutput, LPamount);
     }
 
+    function bootstrap(
+      address newToken,
+      uint256 amount
+    ) external { }
+
     /**
      * @dev Update the fee structure for the exchange
      * @param delistedToken The token that is being delisted
      * @param newlyListedToken The token that is coming in its place
      * @param listingTarget The amount of tokens required for the listing to become active
      */
-     function changeListing(
-         address delistedToken,                              // Address of tokens to be
-         address newlyListedToken,                      // Address of tokens to be added
-         uint112 listingTarget                                // Amount of tokens needed to activate listing
+    function changeListing(
+       address delistedToken,                              // Address of tokens to be
+       address newlyListedToken,                      // Address of tokens to be added
+       uint112 listingTarget                                // Amount of tokens needed to activate listing
     ) external onlyListedToken(delistedToken) onlyOwner() {
         ListingUpdate memory update = listingUpdate;
         require(update.delistedToken == address(0), 'Previous update incomplete.');
