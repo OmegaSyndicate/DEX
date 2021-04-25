@@ -24,25 +24,39 @@ interface IOmegaDEX {
       uint256 minOutputAmount
     ) external returns (uint256 actualOutput);
 
+    function bootstrap(
+      address inputToken,
+      uint256 maxInputAmount,
+      address outputToken
+    ) external returns (uint256 outputAmount);
+
     event Swapped(
-        address sender,
-        address inputToken,
-        address outputToken,
-        uint256 inputAmount,
-        uint256 outputAmount
+      address sender,
+      address inputToken,
+      address outputToken,
+      uint256 inputAmount,
+      uint256 outputAmount
     );
 
     event LiquidityAdded(
-        address sender,
-        address token,
-        uint256 tokenAmount,
-        uint256 LPs
+      address sender,
+      address token,
+      uint256 tokenAmount,
+      uint256 LPs
     );
 
     event LiquidityRemoved(
-        address recipient,
-        address token,
-        uint256 tokenAmount,
-        uint256 LPs
+      address recipient,
+      address token,
+      uint256 tokenAmount,
+      uint256 LPs
+    );
+
+    event LiquidityBootstrapped(
+      address sender,
+      address inputToken,
+      uint256 inputAmount,
+      address outputToken,
+      uint256 outputAmount
     );
 }

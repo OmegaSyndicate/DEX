@@ -28,8 +28,8 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
     }
 
     struct ListingUpdate {
-        address delistedToken;                    // Token to be removed
-        address newlyListedToken;             // Token to be listed
+        address tokenToDelist;                    // Token to be removed
+        address tokenToList;             // Token to be listed
     }
 
     mapping(address => TokenSettings) public listedTokens;
@@ -40,7 +40,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
     * Only works correctly when invoked with full list of 15 token addresses.
     * Doesn't do any checks. Make sure you ONLY add well behaved ERC20s!!
     */
-    constructor(address[] memory tokensToList) ERC20("ODX index 1", "ODX1") {
+    constructor(address[] memory tokensToList) ERC20("ODX index 1", "OIX1") {
         Config memory config;
         config.unlocked = false;
         config.oneMinusTradingFee = 0xffbe76c8b4;
@@ -173,11 +173,11 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         factor = (factor * factor) >> 80;                     // ^16     (16.80 bits)
         require(
             netInputAmount >= initialBalance.mul(factor - (1 << 80)) >> 80,
-            'ODX: Insufficient input.'      // Can't escape this overflow check
+            "ODX: Insufficient input."      // Can't escape this overflow check
         );
 
         deltaLP = R * _totalSupply >> 40;
-        require(deltaLP >= minLP, 'ODX: No deal.');
+        require(deltaLP >= minLP, "ODX: No deal.");
         _mint(msg.sender, deltaLP);
         // emitting events costs gas, but I feel it is needed to allow informed governance decisions
         emit LiquidityAdded(msg.sender, inputToken, inputAmount, deltaLP);
@@ -216,7 +216,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         fraction *= fraction;                                     // (1-R(1-fee))^8         (0.80 bits)
         fraction = fraction * fraction >> 80;                     // (1-R(1-fee))^16        (0.80 bits)
         actualOutput = initialBalance * ((1 << 80) - fraction) >> 80;
-        require(actualOutput > minOutputAmount, 'ODX: No deal.');
+        require(actualOutput > minOutputAmount, "ODX: No deal.");
 
         _burn(msg.sender, LPamount);
         if (outputToken == address(0)) {
@@ -230,35 +230,75 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
     }
 
     function bootstrap(
-      address newToken,
-      uint256 amount
-    ) external { }
+      address inputToken,
+      uint256 maxInputAmount,
+      address outputToken
+    ) external override returns (uint256 outputAmount) {
+      TokenSettings memory tokenToList = listedTokens[inputToken];
+      require(
+        tokenToList.state == State.PreListing,
+        "ODX: Wrong token."
+      );
+      uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
+      uint256 availableAmount = initialInputBalance - tokenToList.listingTarget;
+      uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
+
+      require(
+        IERC20(inputToken).transferFrom(msg.sender, address(this), actualInputAmount),
+        "ODX: token transfer failed."
+      );
+
+      TokenSettings memory tokenToDelist = listedTokens[outputToken];
+      require(
+        tokenToDelist.state == State.Delisting,
+        "ODX: Wrong token."
+      );
+      uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
+      outputAmount = actualInputAmount.mul(initialOutputBalance).div(initialInputBalance);
+      IERC20(outputToken).transfer(msg.sender, outputAmount);
+
+      if (actualInputAmount == availableAmount) {
+        tokenToList.state = State.Listed;
+        listedTokens[inputToken] = tokenToList;
+        delete listedTokens[outputToken];
+        delete listingUpdate;
+      }
+
+      emit LiquidityBootstrapped(
+        msg.sender,
+        inputToken,
+        actualInputAmount,
+        outputToken,
+        outputAmount
+      );
+    }
 
     /**
      * @dev Update the fee structure for the exchange
-     * @param delistedToken The token that is being delisted
-     * @param newlyListedToken The token that is coming in its place
+     * @param tokenToDelist The token that is being delisted
+     * @param tokenToList The token that is coming in its place
      * @param listingTarget The amount of tokens required for the listing to become active
      */
     function changeListing(
-       address delistedToken,                              // Address of tokens to be
-       address newlyListedToken,                      // Address of tokens to be added
-       uint112 listingTarget                                // Amount of tokens needed to activate listing
-    ) external onlyListedToken(delistedToken) onlyOwner() {
+       address tokenToDelist,              // Address of token to be delisted
+       address tokenToList,                // Address of token to be listed
+       uint112 listingTarget               // Amount of tokens needed to activate listing
+    ) external onlyListedToken(tokenToDelist) onlyOwner() {
+        require(tokenToDelist != address(0), "ODX: Cannot delist ETH.");
         ListingUpdate memory update = listingUpdate;
-        require(update.delistedToken == address(0), 'Previous update incomplete.');
+        require(update.tokenToDelist == address(0), "ODX: Previous update incomplete.");
 
-        TokenSettings memory _token = listedTokens[newlyListedToken];
-        require(_token.state == State.Unlisted, 'Token already listed.');
+        TokenSettings memory _token = listedTokens[tokenToList];
+        require(_token.state == State.Unlisted, "ODX: Token already listed.");
 
-        update.delistedToken = delistedToken;
-        update.newlyListedToken = newlyListedToken;
+        update.tokenToDelist = tokenToDelist;
+        update.tokenToList = tokenToList;
         listingUpdate = update;
 
         _token.state = State.PreListing;
         _token.listingTarget = listingTarget;
-        listedTokens[newlyListedToken] = _token;
-        listedTokens[delistedToken].state = State.Delisting;
+        listedTokens[tokenToList] = _token;
+        listedTokens[tokenToDelist].state = State.Delisting;
     }
 
     /**
