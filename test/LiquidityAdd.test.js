@@ -77,6 +77,18 @@ contract('LiquidityAdd', accounts => {
       .to.be.bignumber.equal('11000000000000000000000');
   });
 
+  it('rejects very large single side liquidity addition', async () => {
+    await expectRevert(
+      omegaDEX.addLiquidity(
+        constants.ZERO_ADDRESS,
+        11n*ONE,
+        0n,
+        { from : trader_eth , value : 11e18}
+      ),
+      "ODX: Excessive add."
+    );
+  });
+
   it('rejects transaction when asking too many LP', async () => {
     await expectRevert(
       omegaDEX.addLiquidity(

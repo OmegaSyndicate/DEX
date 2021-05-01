@@ -76,6 +76,18 @@ contract('LiquidityRemove', accounts => {
     );
   });
 
+  it('rejects withdrawing more than owned', async () => {
+    await expectRevert(
+      omegaDEX.removeLiquidity(
+        1000n * ONE,
+        tokenA.address,
+        0n,
+        { from : trader_A }
+      ),
+      "ERC20: burn amount exceeds balance"
+    );
+  });
+
   it('rejects withdrawals when over-asking', async () => {
     await expectRevert(
       omegaDEX.removeLiquidity(

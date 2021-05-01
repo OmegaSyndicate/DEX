@@ -111,8 +111,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         }
         // Can skip overflow/underflow checks on this calculation as they will always work against an attacker anyway.
         uint256 netInputAmount = inputAmount * _config.oneMinusTradingFee;
-        outputAmount = netInputAmount * initialOutputBalance;
-        outputAmount = outputAmount / ((initialInputBalance << 40) + netInputAmount);
+        outputAmount = netInputAmount * initialOutputBalance / ((initialInputBalance << 40) + netInputAmount);
         require(outputAmount > minOutputAmount, "ODX: No deal.");
 
         if (outputToken == address(0)) {
@@ -133,8 +132,8 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         DEX behaves as if liquidity were added to all listed tokens, and then all the added liquidity is
         swapped back to the selected token. For N listed tokens, we get:
 
-              LP_minted = R * LP_total                                                       , where R needs to satisfy
-             X_initial * (-1 + (1+R) ^ N) = X_supplied
+              LP_minted = R * LP_total
+              R = (1 + X_supplied/X_initial)^(1/N) - 1
 
         When adding ETH, the inputToken address to be used is the NULL address.
         Note that for withdrawal transactions, a swapping fee is taken into account. The reason for
@@ -162,7 +161,6 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
                 "ODX: Transfer failed."
             );
         }
-
         require(inputAmount < initialBalance, "ODX: Excessive add.");
 
         uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.40 bits
@@ -178,7 +176,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         R_ = R_ - (X_ * 2417163 >> 108);                   // R6    0.40 bits
 
         actualLP = R_ * _totalSupply >> 40;
-        require(actualLP >= minLP, "ODX: No deal.");
+        require(actualLP > minLP, "ODX: No deal.");
         _mint(msg.sender, actualLP);
         // emitting events costs gas, but I feel it is needed to allow informed governance decisions
         emit LiquidityAdded(msg.sender, inputToken, inputAmount, actualLP);
@@ -189,11 +187,11 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         the liquidity should be withdrawn from all tokens in the appropriate ratios. However, with up
         to 16 listed tokens this becomes impractical and expensive. Thus, liquidity is only withdrawn
         from a single token instead. Mathematically, the DEX behaves as if the liquidity was indeed
-        withdrawn from all listed tokens, and then swapped back to the selected token. For N listed
-        tokens, this works out to:
+        withdrawn from all listed tokens, and then swapped back to the selected token at no fee.
+        For N listed tokens, this works out to:
 
             LP_burnt = R * LP_initial
-            X_withdrawn = X_initial * (1 -  (1 - R) ^ N)
+            X_withdrawn = X_initial * (1 -  (1 - R)^N)
 
      */
     function removeLiquidity(uint256 LPamount, address outputToken, uint256 minOutputAmount)
