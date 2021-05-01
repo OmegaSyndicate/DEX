@@ -166,16 +166,16 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         require(inputAmount < initialBalance, "ODX: Excessive add.");
 
         uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.40 bits
-        uint256 X_ = X * X >> 40;                          // X^2   0.80 bits
-        uint256 R_ = (X >> 4) - (X_ * 15 >> 9);            // R2    0.40 bits
-        X_ = X_ * X >> 40;                                 // X^3   0.40 bits
-        R_ = R_ + (X_ * 155 >> 13);                        // R3    0.40 bits
-        X_ = X_ * X >> 40;                                 // X^4   0.80 bits
-        R_ = R_ - (X_ * 7285 >> 19);                       // R4    0.40 bits
-        X_ = X_ * X >> 40;                                 // X^5   0.40 bits
-        R_ = R_ + (X_ * 91791 >> 23);                      // R5    0.40 bits
-        X_ = X_ * X >> 40;                                 // X^6   0.80 bits
-        R_ = R_ - (X_ * 2417163 >> 28);                    // R6    0.40 bits
+        uint256 X_ = X * X;                                // X^2   0.80 bits
+        uint256 R_ = (X >> 4) - (X_ * 15 >> 49);           // R2    0.40 bits
+        X_ = X_ * X;                                       // X^3   0.120 bits
+        R_ = R_ + (X_ * 155 >> 93);                        // R3    0.40 bits
+        X_ = X_ * X;                                       // X^4   0.160 bits
+        R_ = R_ - (X_ * 7285 >> 139);                      // R4    0.40 bits
+        X_ = X_ * X >> 120;                                // X^5   0.80 bits
+        R_ = R_ + (X_ * 91791 >> 63);                      // R5    0.40 bits
+        X_ = X_ * X;                                       // X^6   0.120 bits
+        R_ = R_ - (X_ * 2417163 >> 108);                   // R6    0.40 bits
 
         actualLP = R_ * _totalSupply >> 40;
         require(actualLP >= minLP, "ODX: No deal.");
