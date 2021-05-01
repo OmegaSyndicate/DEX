@@ -14,8 +14,7 @@ interface IOmegaDEX {
     function addLiquidity(
       address inputToken,
       uint256 inputAmount,
-      uint256 minLP,
-      uint40 R
+      uint256 minLP
     ) external payable returns (uint256 deltaLP);
 
     function removeLiquidity(

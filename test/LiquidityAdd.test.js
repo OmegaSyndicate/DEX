@@ -34,57 +34,16 @@ contract('LiquidityAdd', accounts => {
       omegaDEX.addLiquidity(
         constants.ZERO_ADDRESS,
         ONE,
-        9550316412060055880n,
-        6562927465n,
+        0n,
         { from : trader_eth , value : 1e18}
       )
     );
     expect(await omegaDEX.balanceOf(trader_eth))
-      .to.be.bignumber.equal('9550316412060055881');
+      .to.be.bignumber.equal('9550315293017774820');
     expect(await web3.eth.getBalance(trader_eth))
       .to.be.bignumber.closeTo('99000000000000000000', '100000000000000000');
     expect(await web3.eth.getBalance(dex))
       .to.be.bignumber.equal('11000000000000000000');
-  });
-
-  it('refuses when using too high R', async () => {
-    await expectRevert(
-      omegaDEX.addLiquidity(
-        constants.ZERO_ADDRESS,
-        ONE,
-        8768488953809117850n,
-        6562927465n,
-        { from : trader_eth , value : 1e18}
-      ),
-      "ODX: Insufficient input."
-    );
-  });
-
-  it('refuses when asking too many LP', async () => {
-    await expectRevert(
-      omegaDEX.addLiquidity(
-        constants.ZERO_ADDRESS,
-        ONE,
-        9550316412060055880n,
-        5989906289n,
-        { from : trader_eth , value : 1e18}
-      ),
-      "ODX: No deal."
-    );
-  });
-
-  it('accepts correct R and LP', async () => {
-    await truffleCost.log(
-      omegaDEX.addLiquidity(
-        constants.ZERO_ADDRESS,
-        ONE,
-        8768488953809117850n,
-        5989906289n,
-        { from : trader_eth , value : 1e18}
-      )
-    );
-    expect(await omegaDEX.balanceOf(trader_eth))
-      .to.be.bignumber.equal('18318805365869173732');
   });
 
   it('rejects incorrect ETH amounts', async () => {
@@ -92,8 +51,7 @@ contract('LiquidityAdd', accounts => {
       omegaDEX.addLiquidity(
         constants.ZERO_ADDRESS,
         ONE,
-        9550316412060055880n,
-        6562927465n,
+        0n,
         { from : trader_eth , value : 0.99e18}
       ),
       "ODX: Incorrect amount of ETH."
@@ -107,17 +65,28 @@ contract('LiquidityAdd', accounts => {
       omegaDEX.addLiquidity(
         tokenA.address,
         1000n*ONE,
-        9659660404269427247n,
-        6562927465n,
+        0n,
         { from : trader_A }
       )
     );
     expect(await omegaDEX.balanceOf(trader_A))
-      .to.be.bignumber.equal('9659660404269427248');
+      .to.be.bignumber.equal('9607320619390305561');
     expect(await tokenA.balanceOf(trader_A))
       .to.be.bignumber.equal('9000000000000000000000');
     expect(await tokenA.balanceOf(dex))
       .to.be.bignumber.equal('11000000000000000000000');
+  });
+
+  it('rejects transaction when asking too many LP', async () => {
+    await expectRevert(
+      omegaDEX.addLiquidity(
+        constants.ZERO_ADDRESS,
+        ONE,
+        9550315293017774819n,
+        { from : trader_eth , value : 1e18}
+      ),
+      "ODX: No deal."
+    );
   });
 
   it('rejects non-listed tokenD as liquidity', async () => {
@@ -128,7 +97,6 @@ contract('LiquidityAdd', accounts => {
         tokenD.address,
         ONE,
         0n,
-        1n,
         { from : trader_D }
       ),
       "ODX: Token not listed."
@@ -142,7 +110,6 @@ contract('LiquidityAdd', accounts => {
         tokenA.address,
         1000n*ONE,
         0n,
-        1n,
         { from : trader_A }
       ),
       "ODX: Locked."

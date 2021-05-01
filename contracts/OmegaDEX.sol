@@ -141,12 +141,12 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         this is that it would otherwise be possible to add/withdraw liquidity rather than swapping,
         thereby avoiding the swapping fee.
     */
-    function addLiquidity(address inputToken, uint256 inputAmount, uint256 minLP, uint40 R)
+    function addLiquidity(address inputToken, uint256 inputAmount, uint256 minLP)
         external
         payable
         onlyListedToken(inputToken)
         override
-        returns (uint256 deltaLP)
+        returns (uint256 actualLP)
     {
         Config memory _config = ODX_config;
         require(_config.unlocked, "ODX: Locked.");
@@ -163,24 +163,25 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
             );
         }
 
-        uint256 netInputAmount = inputAmount * _config.oneMinusTradingFee >> 40;
+        require(inputAmount < initialBalance, "ODX: Excessive add.");
 
-        uint factor;
-        factor = (1 << 40) + R;                                          // ^1      (1.40 bits)
-        factor *= factor;                                                 // ^2      (2.80 bits)
-        factor = (factor * factor) >> 120;                   // ^4      (4.40 bits)
-        factor *= factor;                                                 // ^8      (8.80 bits)
-        factor = (factor * factor) >> 80;                     // ^16     (16.80 bits)
-        require(
-            netInputAmount >= initialBalance.mul(factor - (1 << 80)) >> 80,
-            "ODX: Insufficient input."      // Can't escape this overflow check
-        );
+        uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.40 bits
+        uint256 X_ = X * X >> 40;                          // X^2   0.80 bits
+        uint256 R_ = (X >> 4) - (X_ * 15 >> 9);            // R2    0.40 bits
+        X_ = X_ * X >> 40;                                 // X^3   0.40 bits
+        R_ = R_ + (X_ * 155 >> 13);                        // R3    0.40 bits
+        X_ = X_ * X >> 40;                                 // X^4   0.80 bits
+        R_ = R_ - (X_ * 7285 >> 19);                       // R4    0.40 bits
+        X_ = X_ * X >> 40;                                 // X^5   0.40 bits
+        R_ = R_ + (X_ * 91791 >> 23);                      // R5    0.40 bits
+        X_ = X_ * X >> 40;                                 // X^6   0.80 bits
+        R_ = R_ - (X_ * 2417163 >> 28);                    // R6    0.40 bits
 
-        deltaLP = R * _totalSupply >> 40;
-        require(deltaLP >= minLP, "ODX: No deal.");
-        _mint(msg.sender, deltaLP);
+        actualLP = R_ * _totalSupply >> 40;
+        require(actualLP >= minLP, "ODX: No deal.");
+        _mint(msg.sender, actualLP);
         // emitting events costs gas, but I feel it is needed to allow informed governance decisions
-        emit LiquidityAdded(msg.sender, inputToken, inputAmount, deltaLP);
+        emit LiquidityAdded(msg.sender, inputToken, inputAmount, actualLP);
     }
 
     /**
