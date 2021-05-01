@@ -58,4 +58,9 @@ interface IOmegaDEX {
       address outputToken,
       uint256 outputAmount
     );
+
+    event BootstrapCompleted(
+      address delistedToken,
+      address listedToken
+    );
 }

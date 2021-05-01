@@ -15,16 +15,11 @@ contract('LiquidityAdd', accounts => {
 
   before(async () => {
     tokenA = await TokenA.deployed()
-    tokenB = await TokenB.deployed()
-    tokenC = await TokenC.deployed()
-    tokenD = await TokenD.deployed()
     omegaDEX = await OmegaDEX.deployed();
     dex = omegaDEX.address;
 
     await omegaDEX.send(10e18);
     await tokenA.transfer(omegaDEX.address, 10000n * ONE);
-    await tokenB.transfer(omegaDEX.address, 20000n * ONE);
-    await tokenC.transfer(omegaDEX.address, 50000n * ONE);
     await tokenD.transfer(omegaDEX.address, 100000n * ONE);
     await omegaDEX.unlockExchange();
   });

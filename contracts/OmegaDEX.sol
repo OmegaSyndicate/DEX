@@ -229,6 +229,11 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         emit LiquidityRemoved(msg.sender, outputToken, actualOutput, LPamount);
     }
 
+    /** When a token is delisted and another one gets listed in its place, the users can
+        call this function to provide liquidity for the new token in exchange for the old
+        token. The ratio should be set such that the users have a financial incentive to
+        perform this transaction.
+     */
     function bootstrap(
       address inputToken,
       uint256 maxInputAmount,
@@ -254,15 +259,8 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         "ODX: Wrong token."
       );
       uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
-      outputAmount = actualInputAmount.mul(initialOutputBalance).div(initialInputBalance);
+      outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
       IERC20(outputToken).transfer(msg.sender, outputAmount);
-
-      if (actualInputAmount == availableAmount) {
-        tokenToList.state = State.Listed;
-        listedTokens[inputToken] = tokenToList;
-        delete listedTokens[outputToken];
-        delete listingUpdate;
-      }
 
       emit LiquidityBootstrapped(
         msg.sender,
@@ -271,6 +269,14 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         outputToken,
         outputAmount
       );
+
+      if (actualInputAmount == availableAmount) {
+        tokenToList.state = State.Listed;
+        listedTokens[inputToken] = tokenToList;
+        delete listedTokens[outputToken];
+        delete listingUpdate;
+        emit BootstrapCompleted(outputToken, inputToken);
+      }
     }
 
     /**
