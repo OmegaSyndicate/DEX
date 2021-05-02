@@ -34,7 +34,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
 
     mapping(address => TokenSettings) public listedTokens;
     Config public ODX_config;
-    ListingUpdate listingUpdate;
+    ListingUpdate public listingUpdate;
 
     /**
     * Only works correctly when invoked with full list of 15 token addresses.

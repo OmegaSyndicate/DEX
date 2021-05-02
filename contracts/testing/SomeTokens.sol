@@ -20,3 +20,6 @@ contract TokenC is SomeToken {
 contract TokenD is SomeToken {
   constructor() SomeToken("TokenD", "TOKD") {}
 }
+contract TokenE is SomeToken {
+  constructor() SomeToken("TokenD", "TOKD") {}
+}
