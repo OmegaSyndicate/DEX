@@ -234,7 +234,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         token. The ratio should be set such that the users have a financial incentive to
         perform this transaction.
      */
-    function bootstrap(
+    function bootstrapNewToken(
       address inputToken,
       uint256 maxInputAmount,
       address outputToken
@@ -245,7 +245,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         "ODX: Wrong token."
       );
       uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
-      uint256 availableAmount = initialInputBalance - tokenToList.listingTarget;
+      uint256 availableAmount = tokenToList.listingTarget - initialInputBalance;
       uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
 
       require(

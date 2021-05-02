@@ -12,11 +12,12 @@ const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
 contract('ChangeListedTokens', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D] = accounts;
+  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D, trader_E] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
     tokenB = await TokenB.deployed()
+    tokenC = await TokenC.deployed()
     tokenD = await TokenD.deployed()
     tokenE = await TokenE.deployed()
     omegaDEX = await OmegaDEX.deployed();
@@ -84,5 +85,50 @@ contract('ChangeListedTokens', accounts => {
     );
   });
 
+  it('rejects wrong listed bootstrap token C', async () => {
+    await tokenC.transfer(trader_C, 10000n * ONE)
+    await tokenC.approve(omegaDEX.address, 10000n*ONE, { from : trader_C })
+    await expectRevert(
+      omegaDEX.bootstrapNewToken(
+        tokenC.address,
+        10000n * ONE,
+        tokenA.address,
+        { from: trader_C }
+      ),
+      "ODX: Wrong token."
+    );
+  });
+
+  it('rejects wrong non-listed bootstrap token E', async () => {
+    await tokenE.transfer(trader_E, 10000n * ONE)
+    await tokenE.approve(omegaDEX.address, 10000n*ONE, { from : trader_E })
+    await expectRevert(
+      omegaDEX.bootstrapNewToken(
+        tokenE.address,
+        10000n * ONE,
+        tokenA.address,
+        { from: trader_E }
+      ),
+      "ODX: Wrong token."
+    );
+  });
+
+  it('accepts one-shot bootstrapping', async () => {
+    await tokenD.approve(omegaDEX.address, 40000n*ONE, { from : trader_D })
+    await omegaDEX.bootstrapNewToken(
+      tokenD.address,
+      40000n * ONE,
+      tokenA.address,
+      { from: trader_D }
+    );
+    update = await omegaDEX.listingUpdate()
+    expect(update.tokenToList).to.equal(constants.ZERO_ADDRESS);
+    expect(update.tokenToDelist).to.equal(constants.ZERO_ADDRESS);
+    expect(await tokenD.balanceOf(omegaDEX.address)).to.be.bignumber.equal('20000000000000000000000');
+    expect(await tokenA.balanceOf(trader_D)).to.be.bignumber.equal('10000000000000000000000');
+    expect((await omegaDEX.listedTokens(tokenA.address)).state).to.be.bignumber.equal('0');
+    tokenD_status = await omegaDEX.listedTokens(tokenD.address);
+    expect(tokenD_status.state).to.be.bignumber.equal('3');
+  });
 
 });

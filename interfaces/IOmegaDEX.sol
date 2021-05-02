@@ -23,7 +23,7 @@ interface IOmegaDEX {
       uint256 minOutputAmount
     ) external returns (uint256 actualOutput);
 
-    function bootstrap(
+    function bootstrapNewToken(
       address inputToken,
       uint256 maxInputAmount,
       address outputToken
