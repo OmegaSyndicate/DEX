@@ -25,13 +25,11 @@ contract('LiquidityAdd', accounts => {
   });
 
   it('accepts ETH as liquidity', async () => {
-    await truffleCost.log(
-      omegaDEX.addLiquidity(
-        constants.ZERO_ADDRESS,
-        ONE,
-        0n,
-        { from : trader_eth , value : 1e18}
-      )
+    await omegaDEX.addLiquidity(
+      constants.ZERO_ADDRESS,
+      ONE,
+      0n,
+      { from : trader_eth , value : 1e18}
     );
     expect(await omegaDEX.balanceOf(trader_eth))
       .to.be.bignumber.equal('9550315293017774820');
@@ -56,13 +54,11 @@ contract('LiquidityAdd', accounts => {
   it('accepts listed tokenA as liquidity', async () => {
     await tokenA.transfer(trader_A, 10000n * ONE);
     await tokenA.approve(omegaDEX.address, 2000n*ONE, { from : trader_A })
-    await truffleCost.log(
-      omegaDEX.addLiquidity(
-        tokenA.address,
-        1000n*ONE,
-        0n,
-        { from : trader_A }
-      )
+    await omegaDEX.addLiquidity(
+      tokenA.address,
+      1000n*ONE,
+      0n,
+      { from : trader_A }
     );
     expect(await omegaDEX.balanceOf(trader_A))
       .to.be.bignumber.equal('9607320619390305561');

@@ -31,13 +31,11 @@ contract('LiquidityRemove', accounts => {
   });
 
   it('correctly processes ETH withdrawal', async () => {
-    await truffleCost.log(
-      omegaDEX.removeLiquidity(
-        10n * ONE,
-        constants.ZERO_ADDRESS,
-        954000000000000000n,
-        { from : trader_eth }
-      )
+    await omegaDEX.removeLiquidity(
+      10n * ONE,
+      constants.ZERO_ADDRESS,
+      954000000000000000n,
+      { from : trader_eth }
     );
     expect(await omegaDEX.balanceOf(trader_eth))
       .to.be.bignumber.equal('90000000000000000000');
@@ -48,13 +46,11 @@ contract('LiquidityRemove', accounts => {
   });
 
   it('correctly processes TokenA withdrawal', async () => {
-    await truffleCost.log(
-      omegaDEX.removeLiquidity(
-        10n * ONE,
-        tokenA.address,
-        960187926081688418377n,
-        { from : trader_A }
-      )
+    await omegaDEX.removeLiquidity(
+      10n * ONE,
+      tokenA.address,
+      960187926081688418377n,
+      { from : trader_A }
     );
     expect(await omegaDEX.balanceOf(trader_A))
       .to.be.bignumber.equal('90000000000000000000');
@@ -102,13 +98,11 @@ contract('LiquidityRemove', accounts => {
 
   it('allows withdrawals when locked', async () => {
     await omegaDEX.lockExchange();
-    await truffleCost.log(
-      omegaDEX.removeLiquidity(
-        10n * ONE,
-        tokenA.address,
-        873227774499616256904n,
-        { from : trader_A }
-      )
+    await omegaDEX.removeLiquidity(
+      10n * ONE,
+      tokenA.address,
+      873227774499616256904n,
+      { from : trader_A }
     );
     expect(await omegaDEX.balanceOf(trader_A))
       .to.be.bignumber.equal('80000000000000000000');
