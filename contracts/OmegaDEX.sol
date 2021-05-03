@@ -209,13 +209,13 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         }
 
         // Actual amount of output token calculation.
-        uint256 fraction;
-        fraction = (1 << 40) - (LPamount << 40) / _totalSupply;   // (1-R)      (0.40 bits)
-        fraction *= fraction;                                     // (1-R)^2    (0.80 bits)
-        fraction = fraction * fraction >> 120;                    // (1-R)^4    (0.40 bits)
-        fraction *= fraction;                                     // (1-R)^8    (0.80 bits)
-        fraction = fraction * fraction >> 80;                     // (1-R)^16   (0.80 bits)
-        actualOutput = initialBalance * ((1 << 80) - fraction) >> 80;
+        uint256 F_;
+        F_ = (1 << 64) - (LPamount << 64) / _totalSupply;   // (1-R)      (0.60 bits)
+        F_ = F_ * F_;                                       // (1-R)^2    (0.120 bits)
+        F_ = F_ * F_ >> 192;                                // (1-R)^4    (0.60 bits)
+        F_ = F_ * F_;                                       // (1-R)^8    (0.120 bits)
+        F_ = F_ * F_ >> 192;                                // (1-R)^16   (0.60 bits)
+        actualOutput = initialBalance * ((1 << 64) - F_) >> 64;
         require(actualOutput > minOutputAmount, "ODX: No deal.");
 
         _burn(msg.sender, LPamount);

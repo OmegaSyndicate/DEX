@@ -42,7 +42,7 @@ contract('LiquidityRemove', accounts => {
     expect(await web3.eth.getBalance(trader_eth))
       .to.be.bignumber.closeTo('100954000000000000000', '100000000000000000');
     expect(await web3.eth.getBalance(dex))
-      .to.be.bignumber.equal('9045535171720767070');
+      .to.be.bignumber.equal('9045535171661972976');
   });
 
   it('correctly processes TokenA withdrawal', async () => {
@@ -55,9 +55,9 @@ contract('LiquidityRemove', accounts => {
     expect(await omegaDEX.balanceOf(trader_A))
       .to.be.bignumber.equal('90000000000000000000');
     expect(await tokenA.balanceOf(trader_A))
-      .to.be.bignumber.equal('1960187926081688418378');
+      .to.be.bignumber.equal('1960187926107208037881');
     expect(await tokenA.balanceOf(dex))
-      .to.be.bignumber.equal('9039812073918311581622');
+      .to.be.bignumber.equal('9039812073892791962119');
   });
 
   it('rejects non-listed TokenD withdrawal', async () => {
@@ -101,15 +101,15 @@ contract('LiquidityRemove', accounts => {
     await omegaDEX.removeLiquidity(
       10n * ONE,
       tokenA.address,
-      873227774499616256904n,
+      0n,
       { from : trader_A }
     );
     expect(await omegaDEX.balanceOf(trader_A))
       .to.be.bignumber.equal('80000000000000000000');
     expect(await tokenA.balanceOf(trader_A))
-      .to.be.bignumber.equal('2833415700581304675283');
+      .to.be.bignumber.equal('2833415700605589315874');
     expect(await tokenA.balanceOf(dex))
-      .to.be.bignumber.equal('8166584299418695324717');
+      .to.be.bignumber.equal('8166584299394410684126');
   });
 
 
