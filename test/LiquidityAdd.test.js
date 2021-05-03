@@ -32,7 +32,7 @@ contract('LiquidityAdd', accounts => {
       { from : trader_eth , value : 1e18}
     );
     expect(await omegaDEX.balanceOf(trader_eth))
-      .to.be.bignumber.equal('9550315293017774820');
+      .to.be.bignumber.equal('9550315295767706786');
     expect(await web3.eth.getBalance(trader_eth))
       .to.be.bignumber.closeTo('99000000000000000000', '100000000000000000');
     expect(await web3.eth.getBalance(dex))
@@ -61,7 +61,7 @@ contract('LiquidityAdd', accounts => {
       { from : trader_A }
     );
     expect(await omegaDEX.balanceOf(trader_A))
-      .to.be.bignumber.equal('9607320619390305561');
+      .to.be.bignumber.equal('9607320622173065924');
     expect(await tokenA.balanceOf(trader_A))
       .to.be.bignumber.equal('9000000000000000000000');
     expect(await tokenA.balanceOf(dex))

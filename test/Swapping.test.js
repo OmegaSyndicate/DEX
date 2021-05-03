@@ -39,9 +39,9 @@ contract('Swapping', accounts => {
       { from : trader_eth , value : 1001e15}
     );
     expect(await tokenA.balanceOf(trader_eth))
-      .to.be.bignumber.equal('10909090082644384430019');
+      .to.be.bignumber.equal('10909090082644552966951');
     expect(await tokenA.balanceOf(dex))
-      .to.be.bignumber.equal('9090909917355615569981');
+      .to.be.bignumber.equal('9090909917355447033049');
     expect(await web3.eth.getBalance(trader_eth))
       .to.be.bignumber.closeTo('99000000000000000000', '100000000000000000');
     expect(await web3.eth.getBalance(dex))
@@ -62,11 +62,11 @@ contract('Swapping', accounts => {
     expect(await tokenA.balanceOf(trader_A))
       .to.be.bignumber.equal('8999000000000000000000');
     expect(await tokenA.balanceOf(dex))
-      .to.be.bignumber.equal('10091909917355615569981');
+      .to.be.bignumber.equal('10091909917355447033049');
     expect(await tokenB.balanceOf(trader_A))
-      .to.be.bignumber.equal('11981980034087696702569');
+      .to.be.bignumber.equal('11981980034088093935899');
     expect(await tokenB.balanceOf(dex))
-      .to.be.bignumber.equal('18018019965912303297431');
+      .to.be.bignumber.equal('18018019965911906064101');
   });
 
   it('correctly swaps tokenB to ETH', async () => {
@@ -82,7 +82,7 @@ contract('Swapping', accounts => {
     expect(await tokenB.balanceOf(trader_B))
       .to.be.bignumber.equal('8999000000000000000000');
     expect(await tokenB.balanceOf(dex))
-      .to.be.bignumber.equal('19019019965912303297431');
+      .to.be.bignumber.equal('19019019965911906064101');
     expect(await web3.eth.getBalance(trader_B))
       .to.be.bignumber.closeTo('100570000000000000000', '10000000000000000');
     expect(await web3.eth.getBalance(dex))

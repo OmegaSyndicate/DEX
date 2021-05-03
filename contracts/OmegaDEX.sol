@@ -23,7 +23,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
 
     struct Config {
         bool unlocked;                              // Locked for trading to prevent re-entrancy misery
-        uint40 oneMinusTradingFee;        // One minus the swap fee (0.40 fixed point integer)
+        uint64 oneMinusTradingFee;        // One minus the swap fee (0.40 fixed point integer)
         uint40 delistingBonus;                  // Amount of additional tokens to encourage people taking
     }
 
@@ -43,7 +43,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
     constructor(address[] memory tokensToList) ERC20("ODX index 1", "OIX1") {
         Config memory config;
         config.unlocked = false;
-        config.oneMinusTradingFee = 0xffbe76c8b4;
+        config.oneMinusTradingFee = 0xffbe76c8b4395800;
         config.delistingBonus = 0;
         ODX_config = config;
 
@@ -111,7 +111,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         }
         // Can skip overflow/underflow checks on this calculation as they will always work against an attacker anyway.
         uint256 netInputAmount = inputAmount * _config.oneMinusTradingFee;
-        outputAmount = netInputAmount * initialOutputBalance / ((initialInputBalance << 40) + netInputAmount);
+        outputAmount = netInputAmount * initialOutputBalance / ((initialInputBalance << 64) + netInputAmount);
         require(outputAmount > minOutputAmount, "ODX: No deal.");
 
         if (outputToken == address(0)) {
@@ -163,19 +163,19 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         }
         require(inputAmount < initialBalance, "ODX: Excessive add.");
 
-        uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.40 bits
-        uint256 X_ = X * X;                                // X^2   0.80 bits
-        uint256 R_ = (X >> 4) - (X_ * 15 >> 49);           // R2    0.40 bits
-        X_ = X_ * X;                                       // X^3   0.120 bits
-        R_ = R_ + (X_ * 155 >> 93);                        // R3    0.40 bits
-        X_ = X_ * X;                                       // X^4   0.160 bits
-        R_ = R_ - (X_ * 7285 >> 139);                      // R4    0.40 bits
-        X_ = X_ * X >> 120;                                // X^5   0.80 bits
-        R_ = R_ + (X_ * 91791 >> 63);                      // R5    0.40 bits
-        X_ = X_ * X;                                       // X^6   0.120 bits
-        R_ = R_ - (X_ * 2417163 >> 108);                   // R6    0.40 bits
+        uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.64 bits
+        uint256 X_ = X * X;                                // X^2   0.128 bits
+        uint256 R_ = (X >> 4) - (X_ * 15 >> 73);           // R2    0.64 bits
+        X_ = X_ * X;                                       // X^3   0.192 bits
+        R_ = R_ + (X_ * 155 >> 141);                       // R3    0.64 bits
+        X_ = X_ * X >> 192;                                // X^4   0.64 bits
+        R_ = R_ - (X_ * 7285 >> 19);                       // R4    0.64 bits
+        X_ = X_ * X;                                       // X^5   0.128 bits
+        R_ = R_ + (X_ * 91791 >> 87);                      // R5    0.64 bits
+        X_ = X_ * X;                                       // X^6   0.192 bits
+        R_ = R_ - (X_ * 2417163 >> 156);                   // R6    0.64 bits
 
-        actualLP = R_ * _totalSupply >> 40;
+        actualLP = R_ * _totalSupply >> 64;
         require(actualLP > minLP, "ODX: No deal.");
         _mint(msg.sender, actualLP);
         // emitting events costs gas, but I feel it is needed to allow informed governance decisions
@@ -210,11 +210,11 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
 
         // Actual amount of output token calculation.
         uint256 F_;
-        F_ = (1 << 64) - (LPamount << 64) / _totalSupply;   // (1-R)      (0.60 bits)
-        F_ = F_ * F_;                                       // (1-R)^2    (0.120 bits)
-        F_ = F_ * F_ >> 192;                                // (1-R)^4    (0.60 bits)
-        F_ = F_ * F_;                                       // (1-R)^8    (0.120 bits)
-        F_ = F_ * F_ >> 192;                                // (1-R)^16   (0.60 bits)
+        F_ = (1 << 64) - (LPamount << 64) / _totalSupply;   // (1-R)      (0.64 bits)
+        F_ = F_ * F_;                                       // (1-R)^2    (0.128 bits)
+        F_ = F_ * F_ >> 192;                                // (1-R)^4    (0.64 bits)
+        F_ = F_ * F_;                                       // (1-R)^8    (0.128 bits)
+        F_ = F_ * F_ >> 192;                                // (1-R)^16   (0.64 bits)
         actualOutput = initialBalance * ((1 << 64) - F_) >> 64;
         require(actualOutput > minOutputAmount, "ODX: No deal.");
 
