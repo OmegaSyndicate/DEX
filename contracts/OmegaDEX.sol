@@ -17,19 +17,19 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
     enum State {Unlisted, PreListing, Delisting, Listed}
 
     struct TokenSettings {
-        State state;                                     // What state the token is currently in
-        uint112 listingTarget;                    // Amount of tokens needed to activate listing
+        State state;                      // What state the token is currently in
+        uint112 listingTarget;            // Amount of tokens needed to activate listing
     }
 
     struct Config {
-        bool unlocked;                              // Locked for trading to prevent re-entrancy misery
-        uint64 oneMinusTradingFee;        // One minus the swap fee (0.40 fixed point integer)
-        uint40 delistingBonus;                  // Amount of additional tokens to encourage people taking
+        bool unlocked;                    // Locked for trading to prevent re-entrancy misery
+        uint64 oneMinusTradingFee;        // One minus the swap fee (0.64 fixed point integer)
+        uint40 delistingBonus;            // Amount of additional tokens to encourage people taking
     }
 
     struct ListingUpdate {
-        address tokenToDelist;                    // Token to be removed
-        address tokenToList;             // Token to be listed
+        address tokenToDelist;            // Token to be removed
+        address tokenToList;              // Token to be listed
     }
 
     mapping(address => TokenSettings) public listedTokens;
@@ -71,7 +71,7 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         Allows users to swap between any two tokens listed on the DEX.
         The invariant used for swaps between two tokens is the familiar UniSwap AMM hyperbole:
 
-                                                            x * y = k
+                        x * y = k
 
         For ETH trades, send the ETH with the transaction and use the NULL address as inputToken.
     */
@@ -132,8 +132,8 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         DEX behaves as if liquidity were added to all listed tokens, and then all the added liquidity is
         swapped back to the selected token. For N listed tokens, we get:
 
-              LP_minted = R * LP_total
               R = (1 + X_supplied/X_initial)^(1/N) - 1
+              LP_minted = R * LP_total
 
         When adding ETH, the inputToken address to be used is the NULL address.
         Note that for withdrawal transactions, a swapping fee is taken into account. The reason for
@@ -190,8 +190,8 @@ contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
         withdrawn from all listed tokens, and then swapped back to the selected token at no fee.
         For N listed tokens, this works out to:
 
-            LP_burnt = R * LP_initial
-            X_withdrawn = X_initial * (1 -  (1 - R)^N)
+            R = LP_burnt / LP_initial
+            X_out = X_initial * (1 - (1 - R)^N)
 
      */
     function removeLiquidity(uint256 LPamount, address outputToken, uint256 minOutputAmount)
