@@ -1,4 +1,4 @@
-const DeFiPlaza = artifacts.require("DeFiPlaza");
+const DeFiPlaza = artifacts.require("DPL1");
 const TokenA = artifacts.require("TokenA");
 const TokenB = artifacts.require("TokenB");
 const TokenC = artifacts.require("TokenC");

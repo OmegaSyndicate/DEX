@@ -40,7 +40,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     * Only works correctly when invoked with full list of 15 token addresses.
     * Doesn't do any checks. Make sure you ONLY add well behaved ERC20s!!
     */
-    constructor(address[] memory tokensToList) ERC20("ODX index 1", "OIX1") {
+    constructor(address[] memory tokensToList, string memory name_, string memory symbol_) ERC20(name_, symbol_) {
         Config memory config;
         config.unlocked = false;
         config.oneMinusTradingFee = 0xffbe76c8b4395800;
