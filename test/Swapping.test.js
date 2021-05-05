@@ -1,4 +1,4 @@
-const OmegaDEX = artifacts.require('OmegaDEX');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
@@ -18,20 +18,20 @@ contract('Swapping', accounts => {
     tokenB = await TokenB.deployed()
     tokenC = await TokenC.deployed()
     tokenD = await TokenD.deployed()
-    omegaDEX = await OmegaDEX.deployed();
-    dex = omegaDEX.address;
+    defiPlaza = await DeFiPlaza.deployed();
+    dex = defiPlaza.address;
 
-    await omegaDEX.send(10e18);
-    await tokenA.transfer(omegaDEX.address, 10000n * ONE);
-    await tokenB.transfer(omegaDEX.address, 20000n * ONE);
-    await tokenC.transfer(omegaDEX.address, 50000n * ONE);
-    await tokenD.transfer(omegaDEX.address, 100000n * ONE);
-    await omegaDEX.unlockExchange();
+    await defiPlaza.send(10e18);
+    await tokenA.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenB.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenC.transfer(defiPlaza.address, 50000n * ONE);
+    await tokenD.transfer(defiPlaza.address, 100000n * ONE);
+    await defiPlaza.unlockExchange();
   });
 
   it('correctly swaps ETH to tokenA', async () => {
     await tokenA.transfer(trader_eth, 10000n * ONE);
-    await omegaDEX.swap(
+    await defiPlaza.swap(
       constants.ZERO_ADDRESS,
       tokenA.address,
       1001n*FINNEY,
@@ -51,8 +51,8 @@ contract('Swapping', accounts => {
   it('correctly swaps tokenA to tokenB', async () => {
     await tokenA.transfer(trader_A, 10000n * ONE);
     await tokenB.transfer(trader_A, 10000n * ONE);
-    await tokenA.approve(omegaDEX.address, 1001n * ONE, { from : trader_A })
-    await omegaDEX.swap(
+    await tokenA.approve(defiPlaza.address, 1001n * ONE, { from : trader_A })
+    await defiPlaza.swap(
       tokenA.address,
       tokenB.address,
       1001n*ONE,
@@ -71,8 +71,8 @@ contract('Swapping', accounts => {
 
   it('correctly swaps tokenB to ETH', async () => {
     await tokenB.transfer(trader_B, 10000n * ONE);
-    await tokenB.approve(omegaDEX.address, 1001n * ONE, { from : trader_B })
-    await omegaDEX.swap(
+    await tokenB.approve(defiPlaza.address, 1001n * ONE, { from : trader_B })
+    await defiPlaza.swap(
       tokenB.address,
       constants.ZERO_ADDRESS,
       1001n*ONE,
@@ -91,8 +91,8 @@ contract('Swapping', accounts => {
 
   it('gracefully swaps tokenC to tokenC', async () => {
     await tokenC.transfer(trader_C, 10000n * ONE);
-    await tokenC.approve(omegaDEX.address, 1001n * ONE, { from : trader_C })
-    await omegaDEX.swap(
+    await tokenC.approve(defiPlaza.address, 1001n * ONE, { from : trader_C })
+    await defiPlaza.swap(
       tokenC.address,
       tokenC.address,
       1001n*ONE,
@@ -107,9 +107,9 @@ contract('Swapping', accounts => {
 
   it('rejects to swap nonlisted tokenD', async () => {
     await tokenD.transfer(trader_D, 10000n * ONE);
-    await tokenD.approve(omegaDEX.address, 1001n * ONE, { from : trader_D })
+    await tokenD.approve(defiPlaza.address, 1001n * ONE, { from : trader_D })
     await expectRevert(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenD.address,
         tokenA.address,
         1001n*ONE,
@@ -121,10 +121,10 @@ contract('Swapping', accounts => {
   });
 
   it('rejects trades when exchange is locked', async () => {
-    await omegaDEX.lockExchange({ from: owner })
-    await tokenA.approve(omegaDEX.address, 1001n * ONE, { from : trader_A })
+    await defiPlaza.lockExchange({ from: owner })
+    await tokenA.approve(defiPlaza.address, 1001n * ONE, { from : trader_A })
     await expectRevert(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenA.address,
         tokenB.address,
         1001n*ONE,
@@ -133,13 +133,13 @@ contract('Swapping', accounts => {
       ),
       "ODX: Locked."
     );
-    await omegaDEX.unlockExchange({ from: owner })
+    await defiPlaza.unlockExchange({ from: owner })
   });
 
   it('rejects trades when asking too much', async () => {
-    await tokenA.approve(omegaDEX.address, 1001n * ONE, { from : trader_A })
+    await tokenA.approve(defiPlaza.address, 1001n * ONE, { from : trader_A })
     await expectRevert(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenA.address,
         tokenB.address,
         1001n*ONE,

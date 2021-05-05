@@ -1,4 +1,4 @@
-const OmegaDEX = artifacts.require('OmegaDEX');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
@@ -18,20 +18,20 @@ contract('GasUsage', accounts => {
     tokenB = await TokenB.deployed()
     tokenC = await TokenC.deployed()
     tokenD = await TokenD.deployed()
-    omegaDEX = await OmegaDEX.deployed();
-    dex = omegaDEX.address;
+    defiPlaza = await DeFiPlaza.deployed();
+    dex = defiPlaza.address;
 
-    await omegaDEX.send(10e18);
-    await tokenA.transfer(omegaDEX.address, 10000n * ONE);
-    await tokenB.transfer(omegaDEX.address, 20000n * ONE);
-    await tokenC.transfer(omegaDEX.address, 50000n * ONE);
-    await tokenD.transfer(omegaDEX.address, 100000n * ONE);
-    await omegaDEX.unlockExchange();
+    await defiPlaza.send(10e18);
+    await tokenA.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenB.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenC.transfer(defiPlaza.address, 50000n * ONE);
+    await tokenD.transfer(defiPlaza.address, 100000n * ONE);
+    await defiPlaza.unlockExchange();
   });
 
   it('swap ETH to A high gas usage (no A yet)', async () => {
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         constants.ZERO_ADDRESS,
         tokenA.address,
         ONE,
@@ -43,7 +43,7 @@ contract('GasUsage', accounts => {
 
   it('swap ETH to A low gas usage (already has A)', async () => {
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         constants.ZERO_ADDRESS,
         tokenA.address,
         ONE,
@@ -55,9 +55,9 @@ contract('GasUsage', accounts => {
 
   it('swap A to B highest usage (no B yet, keeps some A)', async () => {
     await tokenA.transfer(trader_A, 3000n * ONE);
-    await tokenA.approve(omegaDEX.address, 4000n * ONE, { from : trader_A })
+    await tokenA.approve(defiPlaza.address, 4000n * ONE, { from : trader_A })
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenA.address,
         tokenB.address,
         1000n*ONE,
@@ -69,7 +69,7 @@ contract('GasUsage', accounts => {
 
   it('swap A to B medium usage (has B, keeps some A)', async () => {
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenA.address,
         tokenB.address,
         1000n*ONE,
@@ -81,7 +81,7 @@ contract('GasUsage', accounts => {
 
   it('swap A to B low usage (has B, spends all A)', async () => {
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenA.address,
         tokenB.address,
         1000n*ONE,
@@ -94,7 +94,7 @@ contract('GasUsage', accounts => {
   it('swap A to B lowest usage (has B, spends all A & allowance)', async () => {
     await tokenA.transfer(trader_A, 1000n * ONE);
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenA.address,
         tokenB.address,
         1000n*ONE,
@@ -106,9 +106,9 @@ contract('GasUsage', accounts => {
 
   it('swap B to ETH medium usage (keeps some B)', async () => {
     await tokenB.transfer(trader_B, 2000n * ONE);
-    await tokenB.approve(omegaDEX.address, 3000n * ONE, { from : trader_B })
+    await tokenB.approve(defiPlaza.address, 3000n * ONE, { from : trader_B })
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenB.address,
         constants.ZERO_ADDRESS,
         1000n*ONE,
@@ -120,7 +120,7 @@ contract('GasUsage', accounts => {
 
   it('swap B to ETH low usage (spends all B)', async () => {
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenB.address,
         constants.ZERO_ADDRESS,
         1000n*ONE,
@@ -133,7 +133,7 @@ contract('GasUsage', accounts => {
   it('swap B to ETH lowest usage (spends all B & allowance)', async () => {
     await tokenB.transfer(trader_B, 1000n * ONE);
     await truffleCost.log(
-      omegaDEX.swap(
+      defiPlaza.swap(
         tokenB.address,
         constants.ZERO_ADDRESS,
         1000n*ONE,
@@ -145,7 +145,7 @@ contract('GasUsage', accounts => {
 
   it('add ETH liquidity high (no ODX yet)', async () => {
     await truffleCost.log(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
         ONE,
         0n,
@@ -156,7 +156,7 @@ contract('GasUsage', accounts => {
 
   it('add ETH liquidity low (has ODX)', async () => {
     await truffleCost.log(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
         ONE,
         0n,
@@ -167,9 +167,9 @@ contract('GasUsage', accounts => {
 
   it('add A liquidity high (no ODX yet, keep some A)', async () => {
     await tokenA.transfer(trader_A, 3000n * ONE);
-    await tokenA.approve(omegaDEX.address, 4000n * ONE, { from : trader_A })
+    await tokenA.approve(defiPlaza.address, 4000n * ONE, { from : trader_A })
     await truffleCost.log(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         tokenA.address,
         1000n * ONE,
         0n,
@@ -180,7 +180,7 @@ contract('GasUsage', accounts => {
 
   it('add A liquidity medium (has ODX, keep some A)', async () => {
     await truffleCost.log(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         tokenA.address,
         1000n * ONE,
         0n,
@@ -191,7 +191,7 @@ contract('GasUsage', accounts => {
 
   it('add A liquidity low (has ODX, spend all A)', async () => {
     await truffleCost.log(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         tokenA.address,
         1000n * ONE,
         0n,
@@ -203,7 +203,7 @@ contract('GasUsage', accounts => {
   it('add A liquidity lowest (has ODX, spend all A & allowance)', async () => {
     await tokenA.transfer(trader_A, 1000n * ONE);
     await truffleCost.log(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         tokenA.address,
         1000n * ONE,
         0n,
@@ -213,9 +213,9 @@ contract('GasUsage', accounts => {
   });
 
   it('remove ETH liquidity medium (keep some liquidity)', async () => {
-    await omegaDEX.transfer(trader_C, 2n * ONE);
+    await defiPlaza.transfer(trader_C, 2n * ONE);
     await truffleCost.log(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         1n * ONE,
         constants.ZERO_ADDRESS,
         0n,
@@ -226,7 +226,7 @@ contract('GasUsage', accounts => {
 
   it('remove ETH liquidity low (withdraw all)', async () => {
     await truffleCost.log(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         1n * ONE,
         constants.ZERO_ADDRESS,
         0n,
@@ -236,9 +236,9 @@ contract('GasUsage', accounts => {
   });
 
   it('remove A liquidity high (no A yet, keep some liq)', async () => {
-    await omegaDEX.transfer(trader_C, 3n * ONE);
+    await defiPlaza.transfer(trader_C, 3n * ONE);
     await truffleCost.log(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         1n * ONE,
         tokenA.address,
         0n,
@@ -249,7 +249,7 @@ contract('GasUsage', accounts => {
 
   it('remove A liquidity medium (has A, keep some liq)', async () => {
     await truffleCost.log(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         1n * ONE,
         tokenA.address,
         0n,
@@ -260,7 +260,7 @@ contract('GasUsage', accounts => {
 
   it('remove A liquidity low (has A, spend all liq)', async () => {
     await truffleCost.log(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         1n * ONE,
         tokenA.address,
         0n,

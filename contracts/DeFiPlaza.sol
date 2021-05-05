@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-import "../interfaces/IOmegaDEX.sol";
+import "../interfaces/IDeFiPlaza.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./derived/ERC20Lean.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /*
-	OmegaDEX is a single controct, multi token DEX which allows trades between any two tokens.
+	DeFi Plaza is a single controct, multi token DEX which allows trades between any two tokens.
     Trades between two tokens always follow the familiar local bonding curve x*y=k
     Flash loans of the reserves generate further revenue for LP providers
  */
-contract OmegaDEX is IOmegaDEX, Ownable, ERC20 {
+contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     using SafeMath for uint256;
 
     enum State {Unlisted, PreListing, Delisting, Listed}

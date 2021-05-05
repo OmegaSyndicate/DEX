@@ -1,4 +1,4 @@
-const OmegaDEX = artifacts.require('OmegaDEX');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
@@ -16,28 +16,28 @@ contract('LiquidityRemove', accounts => {
   before(async () => {
     tokenA = await TokenA.deployed()
     tokenD = await TokenD.deployed()
-    omegaDEX = await OmegaDEX.deployed();
-    dex = omegaDEX.address;
+    defiPlaza = await DeFiPlaza.deployed();
+    dex = defiPlaza.address;
 
-    await omegaDEX.send(10e18);
-    await tokenA.transfer(omegaDEX.address, 10000n * ONE);
+    await defiPlaza.send(10e18);
+    await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenA.transfer(trader_A, 1000n * ONE);
-    await tokenD.transfer(omegaDEX.address, 10000n * ONE);
+    await tokenD.transfer(defiPlaza.address, 10000n * ONE);
     await tokenD.transfer(trader_D, 1000n * ONE);
-    await omegaDEX.transfer(trader_eth, 100n * ONE);
-    await omegaDEX.transfer(trader_A, 100n * ONE);
-    await omegaDEX.transfer(trader_D, 100n * ONE);
-    await omegaDEX.unlockExchange();
+    await defiPlaza.transfer(trader_eth, 100n * ONE);
+    await defiPlaza.transfer(trader_A, 100n * ONE);
+    await defiPlaza.transfer(trader_D, 100n * ONE);
+    await defiPlaza.unlockExchange();
   });
 
   it('correctly processes ETH withdrawal', async () => {
-    await omegaDEX.removeLiquidity(
+    await defiPlaza.removeLiquidity(
       10n * ONE,
       constants.ZERO_ADDRESS,
       954000000000000000n,
       { from : trader_eth }
     );
-    expect(await omegaDEX.balanceOf(trader_eth))
+    expect(await defiPlaza.balanceOf(trader_eth))
       .to.be.bignumber.equal('90000000000000000000');
     expect(await web3.eth.getBalance(trader_eth))
       .to.be.bignumber.closeTo('100954000000000000000', '100000000000000000');
@@ -46,13 +46,13 @@ contract('LiquidityRemove', accounts => {
   });
 
   it('correctly processes TokenA withdrawal', async () => {
-    await omegaDEX.removeLiquidity(
+    await defiPlaza.removeLiquidity(
       10n * ONE,
       tokenA.address,
       960187926081688418377n,
       { from : trader_A }
     );
-    expect(await omegaDEX.balanceOf(trader_A))
+    expect(await defiPlaza.balanceOf(trader_A))
       .to.be.bignumber.equal('90000000000000000000');
     expect(await tokenA.balanceOf(trader_A))
       .to.be.bignumber.equal('1960187926107208037881');
@@ -62,7 +62,7 @@ contract('LiquidityRemove', accounts => {
 
   it('rejects non-listed TokenD withdrawal', async () => {
     await expectRevert(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         10n * ONE,
         tokenD.address,
         0n,
@@ -74,7 +74,7 @@ contract('LiquidityRemove', accounts => {
 
   it('rejects withdrawing more than owned', async () => {
     await expectRevert(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         1000n * ONE,
         tokenA.address,
         0n,
@@ -86,7 +86,7 @@ contract('LiquidityRemove', accounts => {
 
   it('rejects withdrawals when over-asking', async () => {
     await expectRevert(
-      omegaDEX.removeLiquidity(
+      defiPlaza.removeLiquidity(
         10n * ONE,
         tokenA.address,
         873227774499616256905n,
@@ -97,14 +97,14 @@ contract('LiquidityRemove', accounts => {
   });
 
   it('allows withdrawals when locked', async () => {
-    await omegaDEX.lockExchange();
-    await omegaDEX.removeLiquidity(
+    await defiPlaza.lockExchange();
+    await defiPlaza.removeLiquidity(
       10n * ONE,
       tokenA.address,
       0n,
       { from : trader_A }
     );
-    expect(await omegaDEX.balanceOf(trader_A))
+    expect(await defiPlaza.balanceOf(trader_A))
       .to.be.bignumber.equal('80000000000000000000');
     expect(await tokenA.balanceOf(trader_A))
       .to.be.bignumber.equal('2833415700605589315874');

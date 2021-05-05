@@ -2,7 +2,7 @@
 pragma solidity ^0.7.6;
 
 
-interface IOmegaDEX {
+interface IDeFiPlaza {
 
     function swap(
         address inputToken,

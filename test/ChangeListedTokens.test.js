@@ -1,4 +1,4 @@
-const OmegaDEX = artifacts.require('OmegaDEX');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
@@ -20,18 +20,18 @@ contract('ChangeListedTokens', accounts => {
     tokenC = await TokenC.deployed()
     tokenD = await TokenD.deployed()
     tokenE = await TokenE.deployed()
-    omegaDEX = await OmegaDEX.deployed();
-    dex = omegaDEX.address;
+    defiPlaza = await DeFiPlaza.deployed();
+    dex = defiPlaza.address;
 
-    await omegaDEX.send(10e18);
-    await tokenA.transfer(omegaDEX.address, 10000n * ONE);
+    await defiPlaza.send(10e18);
+    await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenD.transfer(trader_D, 100000n * ONE);
-    await omegaDEX.unlockExchange();
+    await defiPlaza.unlockExchange();
   });
 
   it('rejects delisting of ETH', async () => {
     await expectRevert(
-      omegaDEX.changeListing(
+      defiPlaza.changeListing(
         constants.ZERO_ADDRESS,
         tokenD.address,
         20000n * ONE
@@ -42,7 +42,7 @@ contract('ChangeListedTokens', accounts => {
 
   it('rejects delisting non-listed token D', async () => {
     await expectRevert(
-      omegaDEX.changeListing(
+      defiPlaza.changeListing(
         tokenD.address,
         tokenD.address,
         20000n * ONE
@@ -54,7 +54,7 @@ contract('ChangeListedTokens', accounts => {
 
   it('rejects to list already listed token B', async () => {
     await expectRevert(
-      omegaDEX.changeListing(
+      defiPlaza.changeListing(
         tokenA.address,
         tokenB.address,
         20000n * ONE
@@ -64,19 +64,19 @@ contract('ChangeListedTokens', accounts => {
   });
 
   it('accepts change of A to D', async () => {
-    await omegaDEX.changeListing(
+    await defiPlaza.changeListing(
       tokenA.address,
       tokenD.address,
       20000n * ONE
     );
-    update = await omegaDEX.listingUpdate()
+    update = await defiPlaza.listingUpdate()
     expect(update.tokenToList).to.equal(tokenD.address);
     expect(update.tokenToDelist).to.equal(tokenA.address);
   });
 
   it('rejects new change when change pending', async () => {
     await expectRevert(
-      omegaDEX.changeListing(
+      defiPlaza.changeListing(
         tokenB.address,
         tokenE.address,
         20000n * ONE
@@ -87,9 +87,9 @@ contract('ChangeListedTokens', accounts => {
 
   it('rejects wrong listed bootstrap token C', async () => {
     await tokenC.transfer(trader_C, 10000n * ONE)
-    await tokenC.approve(omegaDEX.address, 10000n*ONE, { from : trader_C })
+    await tokenC.approve(defiPlaza.address, 10000n*ONE, { from : trader_C })
     await expectRevert(
-      omegaDEX.bootstrapNewToken(
+      defiPlaza.bootstrapNewToken(
         tokenC.address,
         10000n * ONE,
         tokenA.address,
@@ -101,9 +101,9 @@ contract('ChangeListedTokens', accounts => {
 
   it('rejects wrong non-listed bootstrap token E', async () => {
     await tokenE.transfer(trader_E, 10000n * ONE)
-    await tokenE.approve(omegaDEX.address, 10000n*ONE, { from : trader_E })
+    await tokenE.approve(defiPlaza.address, 10000n*ONE, { from : trader_E })
     await expectRevert(
-      omegaDEX.bootstrapNewToken(
+      defiPlaza.bootstrapNewToken(
         tokenE.address,
         10000n * ONE,
         tokenA.address,
@@ -114,20 +114,20 @@ contract('ChangeListedTokens', accounts => {
   });
 
   it('accepts one-shot bootstrapping', async () => {
-    await tokenD.approve(omegaDEX.address, 40000n*ONE, { from : trader_D })
-    await omegaDEX.bootstrapNewToken(
+    await tokenD.approve(defiPlaza.address, 40000n*ONE, { from : trader_D })
+    await defiPlaza.bootstrapNewToken(
       tokenD.address,
       40000n * ONE,
       tokenA.address,
       { from: trader_D }
     );
-    update = await omegaDEX.listingUpdate()
+    update = await defiPlaza.listingUpdate()
     expect(update.tokenToList).to.equal(constants.ZERO_ADDRESS);
     expect(update.tokenToDelist).to.equal(constants.ZERO_ADDRESS);
-    expect(await tokenD.balanceOf(omegaDEX.address)).to.be.bignumber.equal('20000000000000000000000');
+    expect(await tokenD.balanceOf(defiPlaza.address)).to.be.bignumber.equal('20000000000000000000000');
     expect(await tokenA.balanceOf(trader_D)).to.be.bignumber.equal('10000000000000000000000');
-    expect((await omegaDEX.listedTokens(tokenA.address)).state).to.be.bignumber.equal('0');
-    tokenD_status = await omegaDEX.listedTokens(tokenD.address);
+    expect((await defiPlaza.listedTokens(tokenA.address)).state).to.be.bignumber.equal('0');
+    tokenD_status = await defiPlaza.listedTokens(tokenD.address);
     expect(tokenD_status.state).to.be.bignumber.equal('3');
   });
 

@@ -1,4 +1,4 @@
-const OmegaDEX = artifacts.require('OmegaDEX');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
@@ -15,23 +15,23 @@ contract('LiquidityAdd', accounts => {
 
   before(async () => {
     tokenA = await TokenA.deployed()
-    omegaDEX = await OmegaDEX.deployed();
-    dex = omegaDEX.address;
+    defiPlaza = await DeFiPlaza.deployed();
+    dex = defiPlaza.address;
 
-    await omegaDEX.send(10e18);
-    await tokenA.transfer(omegaDEX.address, 10000n * ONE);
-    await tokenD.transfer(omegaDEX.address, 100000n * ONE);
-    await omegaDEX.unlockExchange();
+    await defiPlaza.send(10e18);
+    await tokenA.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenD.transfer(defiPlaza.address, 100000n * ONE);
+    await defiPlaza.unlockExchange();
   });
 
   it('accepts ETH as liquidity', async () => {
-    await omegaDEX.addLiquidity(
+    await defiPlaza.addLiquidity(
       constants.ZERO_ADDRESS,
       ONE,
       0n,
       { from : trader_eth , value : 1e18}
     );
-    expect(await omegaDEX.balanceOf(trader_eth))
+    expect(await defiPlaza.balanceOf(trader_eth))
       .to.be.bignumber.equal('9550315295767706786');
     expect(await web3.eth.getBalance(trader_eth))
       .to.be.bignumber.closeTo('99000000000000000000', '100000000000000000');
@@ -41,7 +41,7 @@ contract('LiquidityAdd', accounts => {
 
   it('rejects incorrect ETH amounts', async () => {
     await expectRevert(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
         ONE,
         0n,
@@ -53,14 +53,14 @@ contract('LiquidityAdd', accounts => {
 
   it('accepts listed tokenA as liquidity', async () => {
     await tokenA.transfer(trader_A, 10000n * ONE);
-    await tokenA.approve(omegaDEX.address, 2000n*ONE, { from : trader_A })
-    await omegaDEX.addLiquidity(
+    await tokenA.approve(defiPlaza.address, 2000n*ONE, { from : trader_A })
+    await defiPlaza.addLiquidity(
       tokenA.address,
       1000n*ONE,
       0n,
       { from : trader_A }
     );
-    expect(await omegaDEX.balanceOf(trader_A))
+    expect(await defiPlaza.balanceOf(trader_A))
       .to.be.bignumber.equal('9607320622173065924');
     expect(await tokenA.balanceOf(trader_A))
       .to.be.bignumber.equal('9000000000000000000000');
@@ -70,7 +70,7 @@ contract('LiquidityAdd', accounts => {
 
   it('rejects very large single side liquidity addition', async () => {
     await expectRevert(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
         11n*ONE,
         0n,
@@ -82,7 +82,7 @@ contract('LiquidityAdd', accounts => {
 
   it('rejects transaction when asking too many LP', async () => {
     await expectRevert(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
         ONE,
         9550315293017774819n,
@@ -94,9 +94,9 @@ contract('LiquidityAdd', accounts => {
 
   it('rejects non-listed tokenD as liquidity', async () => {
     await tokenD.transfer(trader_D, 10000n * ONE);
-    await tokenD.approve(omegaDEX.address, 1000n*ONE, { from : trader_D })
+    await tokenD.approve(defiPlaza.address, 1000n*ONE, { from : trader_D })
     await expectRevert(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         tokenD.address,
         ONE,
         0n,
@@ -107,9 +107,9 @@ contract('LiquidityAdd', accounts => {
   });
 
   it('rejects liquidity when locked', async () => {
-    await omegaDEX.lockExchange();
+    await defiPlaza.lockExchange();
     await expectRevert(
-      omegaDEX.addLiquidity(
+      defiPlaza.addLiquidity(
         tokenA.address,
         1000n*ONE,
         0n,

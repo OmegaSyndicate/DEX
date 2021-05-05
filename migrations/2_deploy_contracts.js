@@ -1,4 +1,4 @@
-const OmegaDEX = artifacts.require("OmegaDEX");
+const DeFiPlaza = artifacts.require("DeFiPlaza");
 const TokenA = artifacts.require("TokenA");
 const TokenB = artifacts.require("TokenB");
 const TokenC = artifacts.require("TokenC");
@@ -12,6 +12,6 @@ module.exports = function(deployer, network, accounts) {
       await deployer.deploy(TokenC);
       await deployer.deploy(TokenD);
       await deployer.deploy(TokenE);
-      await deployer.deploy(OmegaDEX, [TokenA.address, TokenB.address, TokenC.address]);
+      await deployer.deploy(DeFiPlaza, [TokenA.address, TokenB.address, TokenC.address]);
     });
 };
