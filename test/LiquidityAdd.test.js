@@ -47,7 +47,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_eth , value : 0.99e18}
       ),
-      "ODX: Incorrect amount of ETH."
+      "DPL: Incorrect amount of ETH."
     );
   });
 
@@ -76,7 +76,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_eth , value : 11e18}
       ),
-      "ODX: Excessive add."
+      "DPL: Excessive add."
     );
   });
 
@@ -88,7 +88,7 @@ contract('LiquidityAdd', accounts => {
         9550315293017774819n,
         { from : trader_eth , value : 1e18}
       ),
-      "ODX: No deal."
+      "DPL: No deal."
     );
   });
 
@@ -102,7 +102,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_D }
       ),
-      "ODX: Token not listed."
+      "DPL: Token not listed."
     );
   });
 
@@ -115,7 +115,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_A }
       ),
-      "ODX: Locked."
+      "DPL: Locked."
     );
   });
 });

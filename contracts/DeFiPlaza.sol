@@ -8,8 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /*
 	DeFi Plaza is a single controct, multi token DEX which allows trades between any two tokens.
-    Trades between two tokens always follow the familiar local bonding curve x*y=k
-    Flash loans of the reserves generate further revenue for LP providers
+    Trades between two tokens always follow the familiar localized bonding curve x*y=k
  */
 contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     using SafeMath for uint256;
@@ -62,7 +61,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     modifier onlyListedToken(address token) {
         require(
             token == address(0) || listedTokens[token].state > State.Delisting,
-            "ODX: Token not listed."
+            "DPL: Token not listed."
         );
         _;
     }
@@ -89,17 +88,17 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         returns (uint256 outputAmount)
     {
         Config memory _config = ODX_config;
-        require(_config.unlocked, "ODX: Locked.");
+        require(_config.unlocked, "DPL: Locked.");
 
         uint256 initialInputBalance;
         if (inputToken == address(0)) {
-            require(msg.value == inputAmount, "ODX: bad ETH amount.");
+            require(msg.value == inputAmount, "DPL: bad ETH amount.");
             initialInputBalance = address(this).balance - inputAmount;
         } else {
             initialInputBalance = IERC20(inputToken).balanceOf(address(this));
             require(
                 IERC20(inputToken).transferFrom(msg.sender, address(this), inputAmount),
-                "ODX: Transfer failed."
+                "DPL: Transfer failed."
             );
         }
 
@@ -112,7 +111,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         // Can skip overflow/underflow checks on this calculation as they will always work against an attacker anyway.
         uint256 netInputAmount = inputAmount * _config.oneMinusTradingFee;
         outputAmount = netInputAmount * initialOutputBalance / ((initialInputBalance << 64) + netInputAmount);
-        require(outputAmount > minOutputAmount, "ODX: No deal.");
+        require(outputAmount > minOutputAmount, "DPL: No deal.");
 
         if (outputToken == address(0)) {
             address payable sender = msg.sender;
@@ -148,20 +147,20 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         returns (uint256 actualLP)
     {
         Config memory _config = ODX_config;
-        require(_config.unlocked, "ODX: Locked.");
+        require(_config.unlocked, "DPL: Locked.");
 
         uint256 initialBalance;
         if (inputToken == address(0)) {
-            require(msg.value == inputAmount, "ODX: Incorrect amount of ETH.");
+            require(msg.value == inputAmount, "DPL: Incorrect amount of ETH.");
             initialBalance = address(this).balance - inputAmount;
         } else {
             initialBalance = IERC20(inputToken).balanceOf(address(this));
             require(
                 IERC20(inputToken).transferFrom(msg.sender, address(this), inputAmount),
-                "ODX: Transfer failed."
+                "DPL: Transfer failed."
             );
         }
-        require(inputAmount < initialBalance, "ODX: Excessive add.");
+        require(inputAmount < initialBalance, "DPL: Excessive add.");
 
         uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.64 bits
         uint256 X_ = X * X;                                // X^2   0.128 bits
@@ -176,7 +175,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         R_ = R_ - (X_ * 2417163 >> 156);                   // R6    0.64 bits
 
         actualLP = R_ * _totalSupply >> 64;
-        require(actualLP > minLP, "ODX: No deal.");
+        require(actualLP > minLP, "DPL: No deal.");
         _mint(msg.sender, actualLP);
         // emitting events costs gas, but I feel it is needed to allow informed governance decisions
         emit LiquidityAdded(msg.sender, inputToken, inputAmount, actualLP);
@@ -216,7 +215,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         F_ = F_ * F_;                                       // (1-R)^8    (0.128 bits)
         F_ = F_ * F_ >> 192;                                // (1-R)^16   (0.64 bits)
         actualOutput = initialBalance * ((1 << 64) - F_) >> 64;
-        require(actualOutput > minOutputAmount, "ODX: No deal.");
+        require(actualOutput > minOutputAmount, "DPL: No deal.");
 
         _burn(msg.sender, LPamount);
         if (outputToken == address(0)) {
@@ -242,7 +241,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       TokenSettings memory tokenToList = listedTokens[inputToken];
       require(
         tokenToList.state == State.PreListing,
-        "ODX: Wrong token."
+        "DPL: Wrong token."
       );
       uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
       uint256 availableAmount = tokenToList.listingTarget - initialInputBalance;
@@ -250,13 +249,13 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
       require(
         IERC20(inputToken).transferFrom(msg.sender, address(this), actualInputAmount),
-        "ODX: token transfer failed."
+        "DPL: token transfer failed."
       );
 
       TokenSettings memory tokenToDelist = listedTokens[outputToken];
       require(
         tokenToDelist.state == State.Delisting,
-        "ODX: Wrong token."
+        "DPL: Wrong token."
       );
       uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
       outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
@@ -290,12 +289,12 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
        address tokenToList,                // Address of token to be listed
        uint112 listingTarget               // Amount of tokens needed to activate listing
     ) external onlyListedToken(tokenToDelist) onlyOwner() {
-        require(tokenToDelist != address(0), "ODX: Cannot delist ETH.");
+        require(tokenToDelist != address(0), "DPL: Cannot delist ETH.");
         ListingUpdate memory update = listingUpdate;
-        require(update.tokenToDelist == address(0), "ODX: Previous update incomplete.");
+        require(update.tokenToDelist == address(0), "DPL: Previous update incomplete.");
 
         TokenSettings memory _token = listedTokens[tokenToList];
-        require(_token.state == State.Unlisted, "ODX: Token already listed.");
+        require(_token.state == State.Unlisted, "DPL: Token already listed.");
 
         update.tokenToDelist = tokenToDelist;
         update.tokenToList = tokenToList;

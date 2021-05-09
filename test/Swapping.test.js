@@ -116,7 +116,7 @@ contract('Swapping', accounts => {
         0,
         { from : trader_D }
       ),
-      "ODX: Token not listed."
+      "DPL: Token not listed."
     );
   });
 
@@ -131,7 +131,7 @@ contract('Swapping', accounts => {
         0,
         { from : trader_A }
       ),
-      "ODX: Locked."
+      "DPL: Locked."
     );
     await defiPlaza.unlockExchange({ from: owner })
   });
@@ -146,7 +146,7 @@ contract('Swapping', accounts => {
         1820n*ONE,
         { from : trader_A }
       ),
-      "ODX: No deal."
+      "DPL: No deal."
     );
   });
 });
