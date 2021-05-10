@@ -2,6 +2,7 @@ pragma solidity ^0.7.6;
 
 import "./derived/ERC20Lean.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -9,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @author Alberto Cuesta Canada
  * @notice Implements a basic ERC20 staking token with incentive distribution.
  */
-contract DPLgov is ERC20 {
+contract DPLgov is ERC20, Ownable {
     using SafeMath for uint256;
 
     event staked(address staker, uint256 LPamount);
@@ -27,12 +28,17 @@ contract DPLgov is ERC20 {
         uint96 rewardsPerLPAtTimeStaked;        // Baseline rewards at the time these LPs were staked
     }
 
+    address public founder;
+    address public multisig;
     address public indexToken;
     StakingState public stakingState;
     mapping(address => StakeData) public stakerData;
+    uint256 multisigAllocationClaimed;
+    uint256 founderAllocationClaimed;
 
-    constructor(address indexTokenAddress) ERC20("DeFi Plaza governance token", "DPL") {
+    constructor(address indexTokenAddress, address founderAddress) ERC20("DeFi Plaza governance token", "DPL") {
         indexToken = indexTokenAddress;
+        founder = founderAddress;
 
         StakingState memory state;
         state.startTime = 1622498400;
@@ -110,4 +116,45 @@ contract DPLgov is ERC20 {
         emit unstaked(msg.sender, LPamount, rewards);
         return rewards;
     }
+
+    function setMultisigAddress(address multisigAddress)
+        external
+        onlyOwner
+        returns(bool success)
+    {
+        multisig = multisigAddress;
+        return true;
+    }
+
+    function claimMultisigAllocation()
+        external
+        returns(uint256 amountReleased)
+    {
+        StakingState memory state = stakingState;
+        require(block.timestamp > state.startTime, "Too early guys");
+
+        uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
+        t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
+        uint256 R1 = 10e24 * t1 / 31536000 - 5e24 * t1 * t1 / 994519296000000;
+
+        multisigAllocationClaimed = R1;
+        amountReleased = R1 - multisigAllocationClaimed;
+        _mint(multisig, amountReleased);
+    }
+
+    function claimFounderAllocation(uint256 amount, address destination)
+        external
+        returns(bool success)
+    {
+        require(msg.sender == founder, "Not yours man");
+        StakingState memory state = stakingState;
+        require(block.timestamp - state.startTime >= 31536000, "Too early man");
+
+        uint256 availableAmount = 5e6 - founderAllocationClaimed;
+        require(founderAllocationClaimed <= availableAmount, "Too much man");
+        founderAllocationClaimed += amount;
+        _mint(destination, amount);
+        return true;
+    }
+
 }

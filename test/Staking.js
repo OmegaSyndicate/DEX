@@ -25,7 +25,7 @@ contract('Staking for governance tokens', accounts => {
     await defiPlaza.transfer(staker_3, 200n*ONE);
   });
 
-  it('Accepts stake', async () => {
+  it('Accepts stake from staker 1', async () => {
     await defiPlaza.approve(dplGov.address, constants.MAX_UINT256, { from : staker_1 });
     await truffleCost.log(
       dplGov.stake(
@@ -33,10 +33,49 @@ contract('Staking for governance tokens', accounts => {
         { from : staker_1 }
       )
     );
+    userBalance = await defiPlaza.balanceOf(staker_1);
+    expect(userBalance).to.be.bignumber.equal('0');
+    balance = await defiPlaza.balanceOf(dplGov.address);
+    expect(balance).to.be.bignumber.equal('200000000000000000000');
     state = await dplGov.stakingState();
     expect(state.totalStake).to.be.bignumber.equal('200000000000000000000');
     staker = await dplGov.stakerData(staker_1);
+    expect(staker.stake).to.be.bignumber.equal('200000000000000000000');
+  });
+
+  it('Accepts stake from staker 2', async () => {
+    await defiPlaza.approve(dplGov.address, constants.MAX_UINT256, { from : staker_2 });
+    await truffleCost.log(
+      dplGov.stake(
+        200n * ONE,
+        { from : staker_2 }
+      )
+    );
+    userBalance = await defiPlaza.balanceOf(staker_1);
+    expect(userBalance).to.be.bignumber.equal('0');
+    balance = await defiPlaza.balanceOf(dplGov.address);
+    expect(balance).to.be.bignumber.equal('400000000000000000000');
+    state = await dplGov.stakingState();
+    expect(state.totalStake).to.be.bignumber.equal('400000000000000000000');
+    staker = await dplGov.stakerData(staker_2);
+    expect(staker.stake).to.be.bignumber.equal('200000000000000000000');
+  });
+
+  it('Gives back stake when unstaking', async () => {
+    await truffleCost.log(
+      dplGov.unstake(
+        200n * ONE,
+        { from : staker_1 }
+      )
+    );
+    userBalance = await defiPlaza.balanceOf(staker_1);
+    expect(userBalance).to.be.bignumber.equal('200000000000000000000');
+    balance = await defiPlaza.balanceOf(dplGov.address);
+    expect(balance).to.be.bignumber.equal('200000000000000000000');
+    state = await dplGov.stakingState();
     expect(state.totalStake).to.be.bignumber.equal('200000000000000000000');
+    staker = await dplGov.stakerData(staker_1);
+    expect(staker.stake).to.be.bignumber.equal('0');
   });
 
 });
