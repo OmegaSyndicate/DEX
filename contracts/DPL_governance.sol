@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
 import "./derived/ERC20Lean.sol";
@@ -84,7 +85,7 @@ contract DPLgov is ERC20, Ownable {
 
     function unstake(uint96 LPamount)
         external
-        returns(uint256 rewardCollected)
+        returns(uint256 rewards)
     {
         StakeData memory staker = stakerData[msg.sender];
         require(
@@ -104,7 +105,7 @@ contract DPLgov is ERC20, Ownable {
         state.totalStake -= LPamount;
         stakingState = state;
 
-        uint256 rewards = ((state.rewardsAccumulatedPerLP - staker.rewardsPerLPAtTimeStaked) * staker.stake) >> 80;
+        rewards = ((state.rewardsAccumulatedPerLP - staker.rewardsPerLPAtTimeStaked) * staker.stake) >> 80;
         if (LPamount == staker.stake) delete stakerData[msg.sender];
         else {
           staker.stake -= LPamount;
