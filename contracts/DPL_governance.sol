@@ -46,7 +46,7 @@ contract DPLgov is ERC20, Ownable {
     }
 
     function stake(uint96 LPamount)
-        public
+        external
         returns(bool success)
     {
         require(
@@ -83,7 +83,7 @@ contract DPLgov is ERC20, Ownable {
     }
 
     function unstake(uint96 LPamount)
-        public
+        external
         returns(uint256 rewardCollected)
     {
         StakeData memory staker = stakerData[msg.sender];
@@ -108,13 +108,13 @@ contract DPLgov is ERC20, Ownable {
         if (LPamount == staker.stake) delete stakerData[msg.sender];
         else {
           staker.stake -= LPamount;
+          staker.rewardsPerLPAtTimeStaked = state.rewardsAccumulatedPerLP;
           stakerData[msg.sender] = staker;
         }
 
         _mint(msg.sender, rewards);
         IERC20(indexToken).transfer(msg.sender, LPamount);
         emit unstaked(msg.sender, LPamount, rewards);
-        return rewards;
     }
 
     function setMultisigAddress(address multisigAddress)
