@@ -7,9 +7,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @title Staking Token (STK)
- * @author Alberto Cuesta Canada
- * @notice Implements a basic ERC20 staking token with incentive distribution.
+ * @title DeFi Plaza governance token (DPLgov)
+ * @author Jazzer 9F
+ * @notice Implements lean on gas liquidity reward program for DeFi Plaza
  */
 contract DPLgov is ERC20, Ownable {
     using SafeMath for uint256;
@@ -44,6 +44,8 @@ contract DPLgov is ERC20, Ownable {
         StakingState memory state;
         state.startTime = 1622498400;
         stakingState = state;
+
+        _mint(founderAddress, 5e24);
     }
 
     function stake(uint96 LPamount)
@@ -54,15 +56,16 @@ contract DPLgov is ERC20, Ownable {
             IERC20(indexToken).transferFrom(msg.sender, address(this), LPamount),
             "DPL: Transfer failed."
         );
-        StakingState memory state = stakingState;
 
+        StakingState memory state = stakingState;
         if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
-            uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
-            t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
-            uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
-            uint256 R0 = 170e24 * state.lastUpdate / 31536000 - 85e24 * state.lastUpdate * state.lastUpdate / 994519296000000;
-            state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / state.totalStake);
-            state.lastUpdate = uint32(t1);
+          uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
+          uint256 t0 = uint256(state.lastUpdate);
+          t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
+          uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
+          uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+          state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / state.totalStake);
+          state.lastUpdate = uint32(t1);
         }
         state.totalStake += LPamount;
         stakingState = state;
@@ -73,7 +76,7 @@ contract DPLgov is ERC20, Ownable {
           staker.rewardsPerLPAtTimeStaked = state.rewardsAccumulatedPerLP;
         } else {
           uint256 LP1 = staker.stake + LPamount;
-          uint256 RLP0_ = (LPamount * state.rewardsAccumulatedPerLP + staker.stake * staker.rewardsPerLPAtTimeStaked) / LP1;
+          uint256 RLP0_ = (uint256(LPamount) * state.rewardsAccumulatedPerLP + uint256(staker.stake) * staker.rewardsPerLPAtTimeStaked) / LP1;
           staker.stake = uint96(LP1);
           staker.rewardsPerLPAtTimeStaked = uint96(RLP0_);
         }
@@ -96,16 +99,17 @@ contract DPLgov is ERC20, Ownable {
         StakingState memory state = stakingState;
         if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
             uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
+            uint256 t0 = uint256(state.lastUpdate);
             t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
             uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
-            uint256 R0 = 170e24 * state.lastUpdate / 31536000 - 85e24 * state.lastUpdate * state.lastUpdate / 994519296000000;
+            uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
             state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / state.totalStake);
             state.lastUpdate = uint32(t1);
         }
         state.totalStake -= LPamount;
         stakingState = state;
 
-        rewards = ((state.rewardsAccumulatedPerLP - staker.rewardsPerLPAtTimeStaked) * staker.stake) >> 80;
+        rewards = ((uint256(state.rewardsAccumulatedPerLP) - staker.rewardsPerLPAtTimeStaked) * staker.stake) >> 80;
         if (LPamount == staker.stake) delete stakerData[msg.sender];
         else {
           staker.stake -= LPamount;
@@ -138,8 +142,8 @@ contract DPLgov is ERC20, Ownable {
         t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
         uint256 R1 = 10e24 * t1 / 31536000 - 5e24 * t1 * t1 / 994519296000000;
 
-        multisigAllocationClaimed = R1;
         amountReleased = R1 - multisigAllocationClaimed;
+        multisigAllocationClaimed = R1;
         _mint(multisig, amountReleased);
     }
 
@@ -151,7 +155,7 @@ contract DPLgov is ERC20, Ownable {
         StakingState memory state = stakingState;
         require(block.timestamp - state.startTime >= 31536000, "Too early man");
 
-        uint256 availableAmount = 5e6 - founderAllocationClaimed;
+        uint256 availableAmount = 5e24 - founderAllocationClaimed;
         require(founderAllocationClaimed <= availableAmount, "Too much man");
         founderAllocationClaimed += amount;
         _mint(destination, amount);
