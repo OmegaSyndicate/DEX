@@ -88,7 +88,7 @@ contract('Staking for governance tokens', accounts => {
     expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.equal('0');
   }); //total stake now 1612
 
-  it('correctly handles zero unstake', async () => {
+  it('distributes rewards on zero unstake', async () => {
     await truffleCost.log(
       dplGov.unstake(
         0n * ONE,
@@ -102,7 +102,6 @@ contract('Staking for governance tokens', accounts => {
     state = await dplGov.stakingState();
     expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.equal(state.rewardsAccumulatedPerLP);
   }); //total stake now 1612
-
 
   it('allows adding to an existing stake', async () => {
     await truffleCost.log(
@@ -118,5 +117,44 @@ contract('Staking for governance tokens', accounts => {
     expect(rewards).to.be.bignumber.equal('0'); // No rewards given out yet
   }); //total stake now 1616
 
+  it('correctly accepts stake from staker 3', async () => {
+    await tokenA.transfer(staker_3, 1000n * ONE);
+    await tokenA.approve(defiPlaza.address, 2000n*ONE, { from : staker_3 });
+    await defiPlaza.addLiquidity(tokenA.address, 1000n * ONE, 0n, { from : staker_3 });
+    await defiPlaza.approve(dplGov.address, constants.MAX_UINT256, { from : staker_3 });
+
+    await truffleCost.log(
+      dplGov.stake(
+        8n * ONE,
+        { from : staker_3 }
+      )
+    );
+    balance = await defiPlaza.balanceOf(dplGov.address);
+    expect(balance).to.be.bignumber.equal('1624000000000000000000');
+    state = await dplGov.stakingState();
+    expect(state.totalStake).to.be.bignumber.equal('1624000000000000000000');
+    staker = await dplGov.stakerData(staker_3);
+    expect(staker.stake).to.be.bignumber.equal('8000000000000000000');
+  }); //total stake now 1624
+
+  it('returns tokens and rewards on unstake', async () => {
+    await truffleCost.log(
+      dplGov.unstake(
+        12n * ONE,
+        { from: owner }
+      )
+    );
+    balance = await defiPlaza.balanceOf(dplGov.address);
+    expect(balance).to.be.bignumber.equal('1612000000000000000000');
+    state = await dplGov.stakingState();
+    expect(state.totalStake).to.be.bignumber.equal('1612000000000000000000');
+    staker = await dplGov.stakerData(owner);
+    expect(staker.stake).to.be.bignumber.equal('1588000000000000000000');
+    returned = await defiPlaza.balanceOf(owner);
+    expect(returned).to.be.bignumber.equal('12000000000000000000');
+    rewards = await dplGov.balanceOf(owner);
+    expect(rewards).to.be.bignumber.equal('1588000000000000000000');
+
+  }); //total stake now 1612
 
 });
