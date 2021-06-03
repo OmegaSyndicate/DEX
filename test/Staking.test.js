@@ -5,7 +5,7 @@ const DeFiPlaza = artifacts.require('DPL1');
 const DPLgov = artifacts.require('DPLgov');
 
 const truffleCost = require('truffle-cost');
-const { constants, expectRevert, time } = require('@openzeppelin/test-helpers');
+const { BN, constants, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { expect, assert } = require('chai');
 const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
@@ -14,11 +14,12 @@ contract('Staking for governance tokens', accounts => {
   const [owner, staker_1, staker_2, staker_3] = accounts;
 
   before(async () => {
-    tokenA = await TokenA.deployed()
-    tokenB = await TokenB.deployed()
-    tokenC = await TokenC.deployed()
+    tokenA = await TokenA.deployed();
+    tokenB = await TokenB.deployed();
+    tokenC = await TokenC.deployed();
     defiPlaza = await DeFiPlaza.deployed();
     dplGov = await DPLgov.deployed();
+    startState = await dplGov.stakingState();
 
     await defiPlaza.unlockExchange();
     await defiPlaza.approve(dplGov.address, constants.MAX_UINT256);
@@ -81,7 +82,7 @@ contract('Staking for governance tokens', accounts => {
   }); //total stake now 1600
 
   it('distributes rewards on zero unstake', async () => {
-    await time.increaseTo(1622498400+7884000); // jump to a quarter year after program start
+    await time.increaseTo(7884000n.add(startState.startTime)); // jump to a quarter year after program start
     await dplGov.unstake(
       0n * ONE,
       { from : staker_1 }
