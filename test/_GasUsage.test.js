@@ -1,4 +1,4 @@
-const DeFiPlaza = artifacts.require('DPL1');
+const DeFiPlaza = artifacts.require('XDP1');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
@@ -143,7 +143,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('add ETH liquidity high (no ODX yet)', async () => {
+  it('add ETH liquidity high (no XDP1 yet)', async () => {
     await truffleCost.log(
       defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
@@ -154,7 +154,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('add ETH liquidity low (has ODX)', async () => {
+  it('add ETH liquidity low (has XDP1)', async () => {
     await truffleCost.log(
       defiPlaza.addLiquidity(
         constants.ZERO_ADDRESS,
@@ -165,7 +165,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('add A liquidity high (no ODX yet, keep some A)', async () => {
+  it('add A liquidity high (no XDP1 yet, keep some A)', async () => {
     await tokenA.transfer(trader_A, 3000n * ONE);
     await tokenA.approve(defiPlaza.address, 4000n * ONE, { from : trader_A })
     await truffleCost.log(
@@ -178,7 +178,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('add A liquidity medium (has ODX, keep some A)', async () => {
+  it('add A liquidity medium (has XDP1, keep some A)', async () => {
     await truffleCost.log(
       defiPlaza.addLiquidity(
         tokenA.address,
@@ -189,7 +189,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('add A liquidity low (has ODX, spend all A)', async () => {
+  it('add A liquidity low (has XDP1, spend all A)', async () => {
     await truffleCost.log(
       defiPlaza.addLiquidity(
         tokenA.address,
@@ -200,7 +200,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('add A liquidity lowest (has ODX, spend all A & allowance)', async () => {
+  it('add A liquidity lowest (has XDP1, spend all A & allowance)', async () => {
     await tokenA.transfer(trader_A, 1000n * ONE);
     await truffleCost.log(
       defiPlaza.addLiquidity(

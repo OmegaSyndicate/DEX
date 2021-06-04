@@ -1,6 +1,6 @@
-const DeFiPlaza = artifacts.require('DPL1');
-const DPLgov = artifacts.require('DPLgov');
-
+const DeFiPlaza = artifacts.require('DFP');
+const DFPgov = artifacts.require('DFPgov');
+const test = require('./tokens.json');
 /**
  * Sets DEX address into staking contract
  * Stakes initial 1600 LPs
@@ -9,8 +9,8 @@ const DPLgov = artifacts.require('DPLgov');
 
    console.log("Setting DEX address in staking contract.");
    defiPlaza = await DeFiPlaza.deployed();
-   result = await defiPlaza.ODX_config();
-   console.log(result);
+   result = await defiPlaza.DFP_config();
+   console.log(defiPlaza.address);
 
    console.log("Staking initial 1600 LP tokens for numerical stability.");
    done();

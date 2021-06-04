@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @author Jazzer 9F
  * @notice Implements lean on gas liquidity reward program for DeFi Plaza
  */
-contract DPLgov is ERC20, Ownable {
+contract DFPgov is ERC20, Ownable {
     using SafeMath for uint256;
 
     event staked(address staker, uint256 LPamount);
@@ -37,12 +37,12 @@ contract DPLgov is ERC20, Ownable {
     uint256 multisigAllocationClaimed;
     uint256 founderAllocationClaimed;
 
-    constructor(address indexTokenAddress, address founderAddress) ERC20("DeFi Plaza governance token", "DPL") {
+    constructor(address indexTokenAddress, address founderAddress) ERC20("DeFi Plaza governance token", "DFP") {
         indexToken = indexTokenAddress;
         founder = founderAddress;
 
         StakingState memory state;
-        state.startTime = 1622498400;
+        state.startTime = 1623708000;  // 15th of June 2021 00:00
         stakingState = state;
 
         _mint(founderAddress, 5e24);

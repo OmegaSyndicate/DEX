@@ -32,7 +32,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
 
     mapping(address => TokenSettings) public listedTokens;
-    Config public ODX_config;
+    Config public DFP_config;
     ListingUpdate public listingUpdate;
 
     /**
@@ -44,7 +44,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         config.unlocked = false;
         config.oneMinusTradingFee = 0xffbe76c8b4395800;
         config.delistingBonus = 0;
-        ODX_config = config;
+        DFP_config = config;
 
         TokenSettings memory listed;
         listed.state = State.Listed;
@@ -87,7 +87,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         override
         returns (uint256 outputAmount)
     {
-        Config memory _config = ODX_config;
+        Config memory _config = DFP_config;
         require(_config.unlocked, "DPL: Locked.");
 
         uint256 initialInputBalance;
@@ -146,7 +146,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         override
         returns (uint256 actualLP)
     {
-        Config memory _config = ODX_config;
+        Config memory _config = DFP_config;
         require(_config.unlocked, "DPL: Locked.");
 
         uint256 initialBalance;
@@ -310,13 +310,13 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         Sets exchange lock.
     */
     function lockExchange() external onlyOwner() {
-        ODX_config.unlocked = false;
+        DFP_config.unlocked = false;
     }
 
     /**
         Resets exchange lock.
     */
     function unlockExchange() external onlyOwner() {
-        ODX_config.unlocked = true;
+        DFP_config.unlocked = true;
     }
 }
