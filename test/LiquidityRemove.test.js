@@ -68,7 +68,7 @@ contract('LiquidityRemove', accounts => {
         0n,
         { from : trader_D }
       ),
-      "DPL: Token not listed."
+      "DFP: Token not listed."
     );
   });
 
@@ -92,7 +92,7 @@ contract('LiquidityRemove', accounts => {
         873227774499616256905n,
         { from : trader_A }
       ),
-      "DPL: No deal."
+      "DFP: No deal."
     );
   });
 

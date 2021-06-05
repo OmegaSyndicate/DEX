@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @title DeFi Plaza governance token (DPLgov)
+ * @title DeFi Plaza governance token (DFPgov)
  * @author Jazzer 9F
  * @notice Implements lean on gas liquidity reward program for DeFi Plaza
  */
@@ -37,8 +37,7 @@ contract DFPgov is ERC20, Ownable {
     uint256 multisigAllocationClaimed;
     uint256 founderAllocationClaimed;
 
-    constructor(address indexTokenAddress, address founderAddress) ERC20("DeFi Plaza governance token", "DFP") {
-        indexToken = indexTokenAddress;
+    constructor(address founderAddress) ERC20("DeFi Plaza governance token", "DFP") {
         founder = founderAddress;
 
         StakingState memory state;
@@ -54,7 +53,7 @@ contract DFPgov is ERC20, Ownable {
     {
         require(
             IERC20(indexToken).transferFrom(msg.sender, address(this), LPamount),
-            "DPL: Transfer failed."
+            "DFP: Transfer failed."
         );
 
         StakingState memory state = stakingState;
@@ -93,7 +92,7 @@ contract DFPgov is ERC20, Ownable {
         StakeData memory staker = stakerData[msg.sender];
         require(
           staker.stake >= LPamount,
-          "DPL: Insufficient stake."
+          "DFP: Insufficient stake."
         );
 
         StakingState memory state = stakingState;
@@ -129,6 +128,16 @@ contract DFPgov is ERC20, Ownable {
     {
         multisig = multisigAddress;
         return true;
+    }
+
+    function setIndexToken(address indexTokenAddress)
+      external
+      onlyOwner
+      returns(bool success)
+    {
+      require(indexToken==address(0), "Already configured");
+      indexToken = indexTokenAddress;
+      return true;
     }
 
     function claimMultisigAllocation()

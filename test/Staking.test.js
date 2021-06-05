@@ -23,6 +23,7 @@ contract('Staking for governance tokens', accounts => {
 
     await defiPlaza.unlockExchange();
     await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256);
+    await dfpGov.setIndexToken(defiPlaza.address);
     await dfpGov.stake(1600n * ONE);    // Need a minimum of 1600 staked at all times
   });
 
