@@ -23,6 +23,17 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+require("regenerator-runtime/runtime");
+//const providerFactory = require("truffle-ledger-wallet-provider").default;
+const LedgerWalletProvider = require('truffle-ledger-provider');
+const mainForkURL = 'https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab';
+const ledgerOptions = {
+  networkId: 1, // mainnet
+  path: "44'/60'/0'/0", // ledger default derivation path
+  askConfirm: false,
+  accountsLength: 1,
+  accountsOffset: 0,
+};
 
 module.exports = {
   /**
@@ -46,6 +57,14 @@ module.exports = {
      host: "127.0.0.1",     // Localhost (default: none)
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
+     },
+
+     sandbox: {
+     //provider: function () {
+     //  return providerFactory("https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab", 1, "44'/60'/0'/0");
+     //},
+     provider: new LedgerWalletProvider(ledgerOptions, `https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab`),
+     network_id: 1,
      }
     // Another network with more advanced options...
     // advanced: {

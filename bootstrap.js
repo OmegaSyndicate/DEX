@@ -1,17 +1,25 @@
-const DeFiPlaza = artifacts.require('DFP');
+const DeFiPlaza = artifacts.require('XDP1');
 const DFPgov = artifacts.require('DFPgov');
-const test = require('./tokens.json');
+
+//const test = require('./tokens.json');
+const { BN, constants, expectRevert, time } = require('@openzeppelin/test-helpers');
+const ONE = 1000000000000000000n
+
 /**
- * Sets DEX address into staking contract
- * Stakes initial 1600 LPs
+ * Does the initialization transactions
  */
  module.exports = async function (done) {
-
    console.log("Setting DEX address in staking contract.");
    defiPlaza = await DeFiPlaza.deployed();
-   result = await defiPlaza.DFP_config();
-   console.log(defiPlaza.address);
+   dfpGov = await DFPgov.deployed();
+   result = await dfpGov.setIndexToken(defiPlaza.address);
+
+   console.log("Approving LP tokens for staking.")
+   await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256);
 
    console.log("Staking initial 1600 LP tokens for numerical stability.");
+   await dfpGov.stake(1600n * ONE);
+
+   console.log("Completed.")
    done();
  };
