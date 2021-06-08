@@ -2,7 +2,7 @@ const DeFiPlaza = artifacts.require('XDP1');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
-const TokenD = artifacts.require('TokenD');
+const TokenZ = artifacts.require('TokenZ');
 const TokenE = artifacts.require('TokenE');
 
 const truffleCost = require('truffle-cost');
@@ -12,20 +12,20 @@ const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
 contract('ChangeListedTokens', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D, trader_E] = accounts;
+  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Z, trader_E] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
     tokenB = await TokenB.deployed()
     tokenC = await TokenC.deployed()
-    tokenD = await TokenD.deployed()
+    tokenZ = await TokenZ.deployed()
     tokenE = await TokenE.deployed()
     defiPlaza = await DeFiPlaza.deployed();
     dex = defiPlaza.address;
 
     await defiPlaza.send(10e18);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
-    await tokenD.transfer(trader_D, 100000n * ONE);
+    await tokenZ.transfer(trader_Z, 100000n * ONE);
     await defiPlaza.unlockExchange();
   });
 
@@ -33,7 +33,7 @@ contract('ChangeListedTokens', accounts => {
     await expectRevert(
       defiPlaza.changeListing(
         constants.ZERO_ADDRESS,
-        tokenD.address,
+        tokenZ.address,
         20000n * ONE
       ),
       "DFP: Cannot delist ETH."
@@ -43,8 +43,8 @@ contract('ChangeListedTokens', accounts => {
   it('rejects delisting non-listed token D', async () => {
     await expectRevert(
       defiPlaza.changeListing(
-        tokenD.address,
-        tokenD.address,
+        tokenZ.address,
+        tokenZ.address,
         20000n * ONE
       ),
       "DFP: Token not listed."
@@ -66,11 +66,11 @@ contract('ChangeListedTokens', accounts => {
   it('accepts change of A to D', async () => {
     await defiPlaza.changeListing(
       tokenA.address,
-      tokenD.address,
+      tokenZ.address,
       20000n * ONE
     );
     update = await defiPlaza.listingUpdate()
-    expect(update.tokenToList).to.equal(tokenD.address);
+    expect(update.tokenToList).to.equal(tokenZ.address);
     expect(update.tokenToDelist).to.equal(tokenA.address);
   });
 
@@ -114,21 +114,21 @@ contract('ChangeListedTokens', accounts => {
   });
 
   it('accepts one-shot bootstrapping', async () => {
-    await tokenD.approve(defiPlaza.address, 40000n*ONE, { from : trader_D })
+    await tokenZ.approve(defiPlaza.address, 40000n*ONE, { from : trader_Z })
     await defiPlaza.bootstrapNewToken(
-      tokenD.address,
+      tokenZ.address,
       40000n * ONE,
       tokenA.address,
-      { from: trader_D }
+      { from: trader_Z }
     );
     update = await defiPlaza.listingUpdate()
     expect(update.tokenToList).to.equal(constants.ZERO_ADDRESS);
     expect(update.tokenToDelist).to.equal(constants.ZERO_ADDRESS);
-    expect(await tokenD.balanceOf(defiPlaza.address)).to.be.bignumber.equal('20000000000000000000000');
-    expect(await tokenA.balanceOf(trader_D)).to.be.bignumber.equal('10000000000000000000000');
+    expect(await tokenZ.balanceOf(defiPlaza.address)).to.be.bignumber.equal('20000000000000000000000');
+    expect(await tokenA.balanceOf(trader_Z)).to.be.bignumber.equal('10000000000000000000000');
     expect((await defiPlaza.listedTokens(tokenA.address)).state).to.be.bignumber.equal('0');
-    tokenD_status = await defiPlaza.listedTokens(tokenD.address);
-    expect(tokenD_status.state).to.be.bignumber.equal('3');
+    tokenZ_status = await defiPlaza.listedTokens(tokenZ.address);
+    expect(tokenZ_status.state).to.be.bignumber.equal('3');
   });
 
 });

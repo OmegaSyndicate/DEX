@@ -2,7 +2,7 @@ const DeFiPlaza = artifacts.require('XDP1');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
-const TokenD = artifacts.require('TokenD');
+const TokenZ = artifacts.require('TokenZ');
 
 const truffleCost = require('truffle-cost');
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
@@ -11,22 +11,22 @@ const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
 contract('LiquidityRemove', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D] = accounts;
+  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Z] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
-    tokenD = await TokenD.deployed()
+    tokenZ = await TokenZ.deployed()
     defiPlaza = await DeFiPlaza.deployed();
     dex = defiPlaza.address;
 
     await defiPlaza.send(10e18);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenA.transfer(trader_A, 1000n * ONE);
-    await tokenD.transfer(defiPlaza.address, 10000n * ONE);
-    await tokenD.transfer(trader_D, 1000n * ONE);
+    await tokenZ.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenZ.transfer(trader_Z, 1000n * ONE);
     await defiPlaza.transfer(trader_eth, 100n * ONE);
     await defiPlaza.transfer(trader_A, 100n * ONE);
-    await defiPlaza.transfer(trader_D, 100n * ONE);
+    await defiPlaza.transfer(trader_Z, 100n * ONE);
     await defiPlaza.unlockExchange();
   });
 
@@ -60,13 +60,13 @@ contract('LiquidityRemove', accounts => {
       .to.be.bignumber.equal('9039812073892791962119');
   });
 
-  it('rejects non-listed TokenD withdrawal', async () => {
+  it('rejects non-listed tokenZ withdrawal', async () => {
     await expectRevert(
       defiPlaza.removeLiquidity(
         10n * ONE,
-        tokenD.address,
+        tokenZ.address,
         0n,
-        { from : trader_D }
+        { from : trader_Z }
       ),
       "DFP: Token not listed."
     );
@@ -111,7 +111,4 @@ contract('LiquidityRemove', accounts => {
     expect(await tokenA.balanceOf(dex))
       .to.be.bignumber.equal('8166584299394410684126');
   });
-
-
-
 });

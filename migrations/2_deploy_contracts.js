@@ -3,6 +3,16 @@ const TokenB = artifacts.require("TokenB");
 const TokenC = artifacts.require("TokenC");
 const TokenD = artifacts.require("TokenD");
 const TokenE = artifacts.require("TokenE");
+const TokenF = artifacts.require("TokenF");
+const TokenG = artifacts.require("TokenG");
+const TokenH = artifacts.require("TokenH");
+const TokenI = artifacts.require("TokenI");
+const TokenJ = artifacts.require("TokenJ");
+const TokenK = artifacts.require("TokenK");
+const TokenL = artifacts.require("TokenL");
+const TokenM = artifacts.require("TokenM");
+const TokenN = artifacts.require("TokenN");
+const TokenZ = artifacts.require("TokenZ");
 const DeFiPlaza = artifacts.require("XDP1");
 const DFPgov = artifacts.require("DFPgov");
 
@@ -13,7 +23,22 @@ module.exports = function(deployer, network, accounts) {
       await deployer.deploy(TokenC);
       await deployer.deploy(TokenD);
       await deployer.deploy(TokenE);
+      await deployer.deploy(TokenF);
+      await deployer.deploy(TokenG);
+      await deployer.deploy(TokenH);
+      await deployer.deploy(TokenI);
+      await deployer.deploy(TokenJ);
+      await deployer.deploy(TokenK);
+      await deployer.deploy(TokenL);
+      await deployer.deploy(TokenM);
+      await deployer.deploy(TokenN);
+      await deployer.deploy(TokenZ);
       await deployer.deploy(DFPgov, accounts[5])
-      await deployer.deploy(DeFiPlaza, [TokenA.address, TokenB.address, TokenC.address]);
+      tokens = [TokenA.address.toLowerCase(), TokenB.address.toLowerCase(), TokenC.address.toLowerCase(),
+        TokenD.address.toLowerCase(), TokenE.address.toLowerCase(), TokenF.address.toLowerCase(),
+        TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
+        TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
+        TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
+      await deployer.deploy(DeFiPlaza, tokens.sort());
     });
 };

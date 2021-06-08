@@ -2,7 +2,7 @@ const DeFiPlaza = artifacts.require('XDP1');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
-const TokenD = artifacts.require('TokenD');
+const TokenZ = artifacts.require('TokenZ');
 
 const truffleCost = require('truffle-cost');
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
@@ -11,13 +11,13 @@ const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
 contract('Swapping', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D] = accounts;
+  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Z] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
     tokenB = await TokenB.deployed()
     tokenC = await TokenC.deployed()
-    tokenD = await TokenD.deployed()
+    tokenZ = await TokenZ.deployed()
     defiPlaza = await DeFiPlaza.deployed();
     dex = defiPlaza.address;
 
@@ -25,7 +25,7 @@ contract('Swapping', accounts => {
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenB.transfer(defiPlaza.address, 20000n * ONE);
     await tokenC.transfer(defiPlaza.address, 50000n * ONE);
-    await tokenD.transfer(defiPlaza.address, 100000n * ONE);
+    await tokenZ.transfer(defiPlaza.address, 100000n * ONE);
     await defiPlaza.unlockExchange();
   });
 
@@ -105,16 +105,16 @@ contract('Swapping', accounts => {
       .to.be.bignumber.to.be.above((50000n*ONE).toString());
   });
 
-  it('rejects to swap nonlisted tokenD', async () => {
-    await tokenD.transfer(trader_D, 10000n * ONE);
-    await tokenD.approve(defiPlaza.address, 1001n * ONE, { from : trader_D })
+  it('rejects to swap nonlisted TokenZ', async () => {
+    await tokenZ.transfer(trader_Z, 10000n * ONE);
+    await tokenZ.approve(defiPlaza.address, 1001n * ONE, { from : trader_Z })
     await expectRevert(
       defiPlaza.swap(
-        tokenD.address,
+        tokenZ.address,
         tokenA.address,
         1001n*ONE,
         0,
-        { from : trader_D }
+        { from : trader_Z }
       ),
       "DFP: Token not listed."
     );

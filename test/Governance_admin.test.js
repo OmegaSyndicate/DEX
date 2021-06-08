@@ -67,7 +67,7 @@ contract('Admin features of governance contract', accounts => {
   it('multisig asking again doesnt give more', async () => {
     await dfpGov.claimMultisigAllocation();
     balance = await dfpGov.balanceOf(multisig);
-    expect(balance).to.be.bignumber.equal('3750000000000000000000000'); // three quarters of final
+    expect(balance).to.be.bignumber.at.most('3750000158548954891268395'); // up to 1s execution time slack
   });
 
   it('non-founder cannot claim founder reward', async () => {

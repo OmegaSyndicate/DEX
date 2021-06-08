@@ -48,9 +48,14 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
         TokenSettings memory listed;
         listed.state = State.Listed;
-        uint256 nrOfTokens = tokensToList.length > 15 ? 15 : tokensToList.length;
-        for (uint256 i = 0; i < nrOfTokens; i++) {
-          listedTokens[tokensToList[i]] = listed;
+        require(tokensToList.length == 15, "Incorrect number of tokens");
+        address previous = address(0);
+        address current = address(0);
+        for (uint256 i = 0; i < 15; i++) {
+          current = tokensToList[i];
+          require(current > previous, "Require ordered list");
+          listedTokens[current] = listed;
+          previous = current;
         }
 
         _mint(msg.sender, 1600e18);

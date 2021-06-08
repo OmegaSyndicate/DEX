@@ -21,5 +21,35 @@ contract TokenD is SomeToken {
   constructor() SomeToken("TokenD", "TOKD") {}
 }
 contract TokenE is SomeToken {
-  constructor() SomeToken("TokenD", "TOKD") {}
+  constructor() SomeToken("TokenE", "TOKE") {}
+}
+contract TokenF is SomeToken {
+  constructor() SomeToken("TokenF", "TOKF") {}
+}
+contract TokenG is SomeToken {
+  constructor() SomeToken("TokenG", "TOKG") {}
+}
+contract TokenH is SomeToken {
+  constructor() SomeToken("TokenH", "TOKH") {}
+}
+contract TokenI is SomeToken {
+  constructor() SomeToken("TokenI", "TOKI") {}
+}
+contract TokenJ is SomeToken {
+  constructor() SomeToken("TokenJ", "TOKJ") {}
+}
+contract TokenK is SomeToken {
+  constructor() SomeToken("TokenK", "TOKK") {}
+}
+contract TokenL is SomeToken {
+  constructor() SomeToken("TokenL", "TOKL") {}
+}
+contract TokenM is SomeToken {
+  constructor() SomeToken("TokenM", "TOKM") {}
+}
+contract TokenN is SomeToken {
+  constructor() SomeToken("TokenN", "TOKN") {}
+}
+contract TokenZ is SomeToken {
+  constructor() SomeToken("TokenZ", "TOKZ") {}
 }

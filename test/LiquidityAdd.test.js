@@ -2,7 +2,7 @@ const DeFiPlaza = artifacts.require('XDP1');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
-const TokenD = artifacts.require('TokenD');
+const TokenZ = artifacts.require('TokenZ');
 
 const truffleCost = require('truffle-cost');
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
@@ -11,16 +11,17 @@ const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
 contract('LiquidityAdd', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D] = accounts;
+  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Z] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
+    tokenZ = await TokenZ.deployed()
     defiPlaza = await DeFiPlaza.deployed();
     dex = defiPlaza.address;
 
     await defiPlaza.send(10e18);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
-    await tokenD.transfer(defiPlaza.address, 100000n * ONE);
+    await tokenZ.transfer(defiPlaza.address, 100000n * ONE);
     await defiPlaza.unlockExchange();
   });
 
@@ -92,15 +93,15 @@ contract('LiquidityAdd', accounts => {
     );
   });
 
-  it('rejects non-listed tokenD as liquidity', async () => {
-    await tokenD.transfer(trader_D, 10000n * ONE);
-    await tokenD.approve(defiPlaza.address, 1000n*ONE, { from : trader_D })
+  it('rejects non-listed tokenZ as liquidity', async () => {
+    await tokenZ.transfer(trader_Z, 10000n * ONE);
+    await tokenZ.approve(defiPlaza.address, 1000n*ONE, { from : trader_Z })
     await expectRevert(
       defiPlaza.addLiquidity(
-        tokenD.address,
+        tokenZ.address,
         ONE,
         0n,
-        { from : trader_D }
+        { from : trader_Z }
       ),
       "DFP: Token not listed."
     );
