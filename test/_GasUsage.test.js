@@ -3,9 +3,10 @@ const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
 const TokenD = artifacts.require('TokenD');
+const DFPgov = artifacts.require('DFPgov');
 
 const truffleCost = require('truffle-cost');
-const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { BN, constants, expectEvent, expectRevert, time} = require('@openzeppelin/test-helpers');
 const { expect, assert } = require('chai');
 const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
@@ -19,7 +20,8 @@ contract('GasUsage', accounts => {
     tokenC = await TokenC.deployed()
     tokenD = await TokenD.deployed()
     defiPlaza = await DeFiPlaza.deployed();
-    dex = defiPlaza.address;
+    dfpGov = await DFPgov.deployed();
+    startState = await dfpGov.stakingState();
 
     await defiPlaza.send(10e18);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
@@ -27,6 +29,9 @@ contract('GasUsage', accounts => {
     await tokenC.transfer(defiPlaza.address, 50000n * ONE);
     await tokenD.transfer(defiPlaza.address, 100000n * ONE);
     await defiPlaza.unlockExchange();
+
+    await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256);
+    await dfpGov.setIndexToken(defiPlaza.address);
   });
 
   it('swap ETH to A high gas usage (no A yet)', async () => {
@@ -269,4 +274,51 @@ contract('GasUsage', accounts => {
     );
   });
 
+  it('Staking all LPs with no stake existing yet', async () => {
+    await defiPlaza.addLiquidity(constants.ZERO_ADDRESS, 5n*ONE, 0n, { value : 5e18});
+    await dfpGov.stake(1600n * ONE);    // Need a minimum of 1600 staked at all times
+    balance = await defiPlaza.balanceOf(trader_A);
+    await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256, { from : trader_A });
+    await truffleCost.log(
+      dfpGov.stake(
+        balance,
+        { from : trader_A }
+      )
+    );
+  });
+
+  it('Adding all LPs to existing stake', async () => {
+    await tokenA.transfer(trader_A, 3000n * ONE);
+    await tokenA.approve(defiPlaza.address, 4000n * ONE, { from : trader_A })
+    await defiPlaza.addLiquidity(tokenA.address, 1000n * ONE, 0n, { from : trader_A });
+    balance = await defiPlaza.balanceOf(trader_A);
+    await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256, { from : trader_A });
+    await truffleCost.log(
+      dfpGov.stake(
+        balance,
+        { from : trader_A }
+      )
+    );
+  });
+
+  it('Claim first rewards without unstaking', async () => {
+    await time.increase(2592000n); // 30d increase
+    await truffleCost.log(
+      dfpGov.unstake(
+        0n,
+        { from : trader_A }
+      )
+    );
+  });
+
+  it('Unstake and claim everything (already has DFP)', async () => {
+    stakerData = await dfpGov.stakerData(trader_A);
+    await time.increase(2592000n); // 30d increase
+    await truffleCost.log(
+      dfpGov.unstake(
+        stakerData.stake,
+        { from : trader_A }
+      )
+    );
+  });
 });
