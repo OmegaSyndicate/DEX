@@ -274,7 +274,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('Staking all LPs with no stake existing yet', async () => {
+  it('staking all LPs with no stake existing yet', async () => {
     await defiPlaza.addLiquidity(constants.ZERO_ADDRESS, 5n*ONE, 0n, { value : 5e18});
     await dfpGov.stake(1600n * ONE);    // Need a minimum of 1600 staked at all times
     balance = await defiPlaza.balanceOf(trader_A);
@@ -287,7 +287,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('Adding all LPs to existing stake', async () => {
+  it('adding all LPs to existing stake', async () => {
     await tokenA.transfer(trader_A, 3000n * ONE);
     await tokenA.approve(defiPlaza.address, 4000n * ONE, { from : trader_A })
     await defiPlaza.addLiquidity(tokenA.address, 1000n * ONE, 0n, { from : trader_A });
@@ -301,7 +301,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('Claim first rewards without unstaking', async () => {
+  it('claim first rewards without unstaking', async () => {
     await time.increase(2592000n); // 30d increase
     await truffleCost.log(
       dfpGov.unstake(
@@ -311,7 +311,7 @@ contract('GasUsage', accounts => {
     );
   });
 
-  it('Unstake and claim everything (already has DFP)', async () => {
+  it('unstake and claim everything (already has DFP)', async () => {
     stakerData = await dfpGov.stakerData(trader_A);
     await time.increase(2592000n); // 30d increase
     await truffleCost.log(
