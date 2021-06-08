@@ -89,12 +89,13 @@ contract('Staking for governance tokens', accounts => {
       { from : staker_1 }
     );
     rewards = await dfpGov.balanceOf(staker_1);
-    expect(rewards).to.be.bignumber.equal('185937500000000000000000'); // 7/16th of rewards distributed
+    expect(rewards).to.be.bignumber.at.least('185937500000000000000000'); // 7/16th of rewards distributed
+    expect(rewards).to.be.bignumber.lt('185937530000000000000000'); // some leeway for ±1s execution time differences
     staker = await dfpGov.stakerData(staker_1);
     expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.equal('28098080573074389021491200000');
     expect(staker.stake).to.be.bignumber.equal('8000000000000000000');
     state = await dfpGov.stakingState();
-    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.equal('28098080573074389021491200000');
+    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.equal(staker.rewardsPerLPAtTimeStaked);
     expect(state.totalStake).to.be.bignumber.equal('1600000000000000000000');
     balance = await defiPlaza.balanceOf(dfpGov.address);
     expect(balance).to.be.bignumber.equal('1600000000000000000000');
@@ -107,7 +108,8 @@ contract('Staking for governance tokens', accounts => {
       { from : staker_2 }
     );
     state = await dfpGov.stakingState();  // 39/64th of rewards now distributed
-    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.equal('39136612226782184708505600000');
+    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.at.least('39136612226782184708505600000');
+    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.lt('39136615000000000000000000000'); // some leeway for ±1s exectuion time differences
     staker = await dfpGov.stakerData(staker_2);
     expect(staker.stake).to.be.bignumber.equal('4000000000000000000');
     expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.equal('0');
@@ -121,7 +123,8 @@ contract('Staking for governance tokens', accounts => {
     );
     staker = await dfpGov.stakerData(staker_2);
     expect(staker.stake).to.be.bignumber.equal('8000000000000000000');
-    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.equal('24084069062635190589849600000');  // 3/4th of rewards distributed
+    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.at.least('24084069062635190589849599999');  // 3/4th of rewards distributed
+    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.lt('24084080000000000000000000000');  // some leeway for <1s execution time differences
     rewards = await dfpGov.balanceOf(staker_2);
     expect(rewards).to.be.bignumber.equal('0'); // No rewards given out yet
   }); //total stake now 1604
@@ -159,7 +162,8 @@ contract('Staking for governance tokens', accounts => {
     returned = await defiPlaza.balanceOf(owner);
     expect(returned).to.be.bignumber.equal('16000000000000000000');
     rewards = await dfpGov.balanceOf(owner);
-    expect(rewards).to.be.bignumber.equal('79050397443890274314214463');
+    expect(rewards).to.be.bignumber.at.least('79050397443890274314214463');
+    expect(rewards).to.be.bignumber.lt('79050397460000000000000000'); // some leeway for ±1s execution time differences
   }); //total stake now 1608
 
   it('concludes program correctly', async () => {
@@ -169,7 +173,8 @@ contract('Staking for governance tokens', accounts => {
     await dfpGov.unstake(8n * ONE, { from : staker_2 });
     await dfpGov.unstake(8n * ONE, { from : staker_3 });
     totalGov = await dfpGov.totalSupply();
-    expect(totalGov).to.be.bignumber.equal('89999999999999999999999997');
+    expect(totalGov).to.be.bignumber.at.least('89999999999999999999999997');
+    expect(totalGov).to.be.bignumber.at.most('90000000000000000000000000'); // some leeway for ±1s execution time differences
   });
 
 });
