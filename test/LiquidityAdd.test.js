@@ -48,7 +48,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_eth , value : 0.99e18}
       ),
-      "DFP: Incorrect amount of ETH."
+      "DFP: Incorrect amount of ETH"
     );
   });
 
@@ -77,7 +77,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_eth , value : 11e18}
       ),
-      "DFP: Excessive add."
+      "DFP: Too much at once"
     );
   });
 
@@ -89,7 +89,7 @@ contract('LiquidityAdd', accounts => {
         9550315293017774819n,
         { from : trader_eth , value : 1e18}
       ),
-      "DFP: No deal."
+      "DFP: No deal"
     );
   });
 
@@ -103,7 +103,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_Z }
       ),
-      "DFP: Token not listed."
+      "DFP: Token not listed"
     );
   });
 
@@ -116,7 +116,7 @@ contract('LiquidityAdd', accounts => {
         0n,
         { from : trader_A }
       ),
-      "DFP: Locked."
+      "DFP: Locked"
     );
   });
 });

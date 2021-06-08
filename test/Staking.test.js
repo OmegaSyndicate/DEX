@@ -45,6 +45,13 @@ contract('Staking for governance tokens', accounts => {
     expect(returned).to.be.bignumber.equal('12000000000000000000');
   }); //total stake now 1588
 
+  it('can\'t unstake more than was staked', async () => {
+    await expectRevert(
+      dfpGov.unstake(1588n * ONE + 1n),
+      "DFP: Insufficient stake"
+    )
+  });
+
   it('correctly accepts stake from staker 1', async () => {
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenA.transfer(staker_1, 1000n * ONE);

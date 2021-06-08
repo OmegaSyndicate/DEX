@@ -36,7 +36,7 @@ contract('ChangeListedTokens', accounts => {
         tokenZ.address,
         20000n * ONE
       ),
-      "DFP: Cannot delist ETH."
+      "DFP: Cannot delist ETH"
     );
   });
 
@@ -47,7 +47,7 @@ contract('ChangeListedTokens', accounts => {
         tokenZ.address,
         20000n * ONE
       ),
-      "DFP: Token not listed."
+      "DFP: Token not listed"
     );
   });
 
@@ -59,7 +59,7 @@ contract('ChangeListedTokens', accounts => {
         tokenB.address,
         20000n * ONE
       ),
-      "DFP: Token already listed."
+      "DFP: Token already listed"
     );
   });
 
@@ -81,7 +81,7 @@ contract('ChangeListedTokens', accounts => {
         tokenE.address,
         20000n * ONE
       ),
-      "DFP: Previous update incomplete."
+      "DFP: Previous update incomplete"
     );
   });
 
@@ -95,7 +95,7 @@ contract('ChangeListedTokens', accounts => {
         tokenA.address,
         { from: trader_C }
       ),
-      "DFP: Wrong token."
+      "DFP: Wrong token"
     );
   });
 
@@ -109,7 +109,7 @@ contract('ChangeListedTokens', accounts => {
         tokenA.address,
         { from: trader_E }
       ),
-      "DFP: Wrong token."
+      "DFP: Wrong token"
     );
   });
 

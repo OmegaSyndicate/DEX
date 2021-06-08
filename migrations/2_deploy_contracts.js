@@ -17,28 +17,28 @@ const DeFiPlaza = artifacts.require("XDP1");
 const DFPgov = artifacts.require("DFPgov");
 
 module.exports = function(deployer, network, accounts) {
-    deployer.then(async () => {
-      await deployer.deploy(TokenA);
-      await deployer.deploy(TokenB);
-      await deployer.deploy(TokenC);
-      await deployer.deploy(TokenD);
-      await deployer.deploy(TokenE);
-      await deployer.deploy(TokenF);
-      await deployer.deploy(TokenG);
-      await deployer.deploy(TokenH);
-      await deployer.deploy(TokenI);
-      await deployer.deploy(TokenJ);
-      await deployer.deploy(TokenK);
-      await deployer.deploy(TokenL);
-      await deployer.deploy(TokenM);
-      await deployer.deploy(TokenN);
-      await deployer.deploy(TokenZ);
-      await deployer.deploy(DFPgov, accounts[5])
-      tokens = [TokenA.address.toLowerCase(), TokenB.address.toLowerCase(), TokenC.address.toLowerCase(),
-        TokenD.address.toLowerCase(), TokenE.address.toLowerCase(), TokenF.address.toLowerCase(),
-        TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
-        TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
-        TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
-      await deployer.deploy(DeFiPlaza, tokens.sort());
-    });
+  deployer.then(async () => {
+    await deployer.deploy(TokenA);
+    await deployer.deploy(TokenB);
+    await deployer.deploy(TokenC);
+    await deployer.deploy(TokenD);
+    await deployer.deploy(TokenE);
+    await deployer.deploy(TokenF);
+    await deployer.deploy(TokenG);
+    await deployer.deploy(TokenH);
+    await deployer.deploy(TokenI);
+    await deployer.deploy(TokenJ);
+    await deployer.deploy(TokenK);
+    await deployer.deploy(TokenL);
+    await deployer.deploy(TokenM);
+    await deployer.deploy(TokenN);
+    await deployer.deploy(TokenZ);
+    await deployer.deploy(DFPgov, accounts[5])
+    tokens = [TokenA.address.toLowerCase(), TokenB.address.toLowerCase(), TokenC.address.toLowerCase(),
+      TokenD.address.toLowerCase(), TokenE.address.toLowerCase(), TokenF.address.toLowerCase(),
+      TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
+      TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
+      TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
+    await deployer.deploy(DeFiPlaza, tokens.sort());
+  });
 };
