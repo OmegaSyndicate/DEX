@@ -36,7 +36,8 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   ListingUpdate public listingUpdate;
 
   /**
-  * Only works correctly when invoked with full list of 15 token addresses.
+  * Only works correctly when invoked with full list of 16 token addresses.
+  * First address needs to be zero address to represent ETH.
   * Doesn't do any checks. Make sure you ONLY add well behaved ERC20s!!
   */
   constructor(address[] memory tokensToList, string memory name_, string memory symbol_) ERC20(name_, symbol_) {
@@ -192,20 +193,29 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     override
     returns (uint256 actualLP)
   {
+    // Perform validity checks
+    Config memory _config = DFP_config;
+    require(_config.unlocked, "DFP: Locked");
     require(tokens.length == 16, "DFP: Bad tokens array length");
     require(maxAmounts.length == 16, "DFP: Bad maxAmount array length");
 
+    // Check ETH amount/ratio first
     require(tokens[0] == address(0), "DFP: No ETH found");
     require(maxAmounts[0] == msg.value, "DFP: Incorrect ETH amount");
     uint256 dexBalance = address(this).balance - msg.value;
     uint256 actualRatio = msg.value.mul(1<<128) / dexBalance;
 
+    // Check ERC20 amounts/ratios
     uint256 currentRatio;
     address previous;
     address token;
     for (uint256 i = 1; i < 16; i++) {
       token = tokens[i];
       require(token > previous, "DFP: Require ordered list");
+      require(
+        listedTokens[token].state > State.Delisting,
+        "DFP: Token not listed"
+      );
       dexBalance = IERC20(token).balanceOf(address(this));
       currentRatio = maxAmounts[i].mul(1<<128) / dexBalance;
       if (currentRatio < actualRatio) {
@@ -214,20 +224,28 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       previous = token;
     }
 
-    actualLP = currentRatio.mul(_totalSupply) >> 128;
+    // Calculate how many LP will be generated
+    actualLP = actualRatio.mul(_totalSupply) >> 128;
     require(actualLP > minLP, "DFP: No deal");
-    _mint(msg.sender, actualLP);
 
+    // Refund ETH change
+    dexBalance = address(this).balance - msg.value;
+    address payable sender = msg.sender;
+    sender.transfer(msg.value - (dexBalance.mul(actualRatio) >> 128));
+
+    // Collect ERC20 tokens
     previous = address(0);
     for (uint256 i = 1; i < 16; i++) {
       token = tokens[i];
       dexBalance = IERC20(token).balanceOf(address(this));
       require(
-        IERC20(token).transferFrom(msg.sender, address(this), dexBalance.mul(currentRatio) >> 128),
+        IERC20(token).transferFrom(msg.sender, address(this), dexBalance.mul(actualRatio) >> 128),
         "DFP: token transfer failed"
       );
       previous = token;
     }
+
+    _mint(msg.sender, actualLP);
   }
 
   /**
