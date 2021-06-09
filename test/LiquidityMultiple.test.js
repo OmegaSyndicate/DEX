@@ -112,10 +112,17 @@ contract('LiquidityAdd', accounts => {
     await tokenN.approve(defiPlaza.address, constants.MAX_UINT256);
     await dfpGov.approve(defiPlaza.address, constants.MAX_UINT256);
 
-    await truffleCost.log(defiPlaza.addMultiple(tokens, maxAmounts, 0n, { value :  Number(maxAmounts[0]) }));
+    await truffleCost.log(
+      defiPlaza.addMultiple(
+        tokens,
+        maxAmounts,
+        0n,
+        { value :  Number(maxAmounts[0]) }
+      )
+    );
 
     balance = await web3.eth.getBalance(dex);
-    expect(balance).to.be.bignumber.equal('15000000000000000000');    
+    expect(balance).to.be.bignumber.equal('15000000000000000000');
     balance = await tokenA.balanceOf(dex);
     expect(balance).to.be.bignumber.equal('15000000000000000000000');
     balance = await tokenI.balanceOf(dex);

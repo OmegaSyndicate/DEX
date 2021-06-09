@@ -18,6 +18,7 @@
   "devDependencies": {
     "@openzeppelin/test-helpers": "^0.5.10",
     "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
     "truffle": "^5.3.0",
     "truffle-cost": "^1.0.1",
     "truffle-plugin-verify": "^0.5.7"
