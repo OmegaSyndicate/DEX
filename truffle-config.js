@@ -18,24 +18,21 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-//const providerFactory = require("truffle-ledger-wallet-provider").default;
-//require("regenerator-runtime/runtime");
+
 require('dotenv').config();
-mainForkURL = process.env.TRUFFLE_TEAMS_URL;
-//const LedgerWalletProvider = require('@umaprotocol/truffle-ledger-provider');
-//const mainForkURL = 'https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab';
-//const ledgerOptions = {
-//  networkId: 1, // mainnet
-//  path: "44'/60'/0'/0", // ledger default derivation path
-//  askConfirm: true,
-//  accountsLength: 1,
-//  accountsOffset: 0,
-//};
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const mnemonicPhrase = process.env.MNEMONIC;
+const mainForkURL = process.env.TRUFFLE_TEAMS_URL;
+providerConfig = {
+  mnemonic : mnemonicPhrase,
+  providerOrUrl : mainForkURL,
+  numberOfAddresses: 1,
+  addressIndex: 0
+}
 
 module.exports = {
   /**
@@ -60,14 +57,12 @@ module.exports = {
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
      },
-/*
+
      sandbox: {
-     //provider: function () {
-     //  return providerFactory("https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab", 1, "44'/60'/0'/0");
-     //},
-     provider: new LedgerWalletProvider(ledgerOptions, `https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab`),
+     provider: () => new HDWalletProvider(providerConfig),
+     port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
-   }*/
+   }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
