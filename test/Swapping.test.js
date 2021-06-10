@@ -89,23 +89,35 @@ contract('Swapping', accounts => {
       .to.be.bignumber.closeTo('10430000000000000000', '10000000000000000');
   });
 
+  it('gracefully swaps ETH to ETH', async () => {
+    before = await web3.eth.getBalance(dex);
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      constants.ZERO_ADDRESS,
+      1n*ONE,
+      0n,
+      { from : trader_eth, value : 1e18 }
+    );
+    after = await web3.eth.getBalance(dex);
+    expect(after).to.be.bignumber.above(before);
+  });
+
   it('gracefully swaps tokenC to tokenC', async () => {
+    before = await tokenC.balanceOf(dex);
     await tokenC.transfer(trader_C, 10000n * ONE);
     await tokenC.approve(defiPlaza.address, 1001n * ONE, { from : trader_C })
     await defiPlaza.swap(
       tokenC.address,
       tokenC.address,
       1001n*ONE,
-      1000n*ONE,
+      0n,
       { from : trader_C }
     );
-    expect(await tokenC.balanceOf(trader_C))
-      .to.be.bignumber.to.be.below((10000n*ONE).toString());
-    expect(await tokenC.balanceOf(dex))
-      .to.be.bignumber.to.be.above((50000n*ONE).toString());
+    after = await tokenC.balanceOf(dex);
+    expect(after).to.be.bignumber.above(before);
   });
 
-  it('rejects to swap nonlisted TokenZ', async () => {
+  it('rejects to swap nonlisted tokenZ', async () => {
     await tokenZ.transfer(trader_Z, 10000n * ONE);
     await tokenZ.approve(defiPlaza.address, 1001n * ONE, { from : trader_Z })
     await expectRevert(

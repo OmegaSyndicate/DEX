@@ -228,11 +228,6 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     actualLP = actualRatio.mul(_totalSupply) >> 128;
     require(actualLP > minLP, "DFP: No deal");
 
-    // Refund ETH change
-    dexBalance = address(this).balance - msg.value;
-    address payable sender = msg.sender;
-    sender.transfer(msg.value - (dexBalance.mul(actualRatio) >> 128));
-
     // Collect ERC20 tokens
     previous = address(0);
     for (uint256 i = 1; i < 16; i++) {
@@ -245,7 +240,13 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       previous = token;
     }
 
+    // Mint the LP tokens
     _mint(msg.sender, actualLP);
+
+    // Refund ETH change
+    dexBalance = address(this).balance - msg.value;
+    address payable sender = msg.sender;
+    sender.transfer(msg.value - (dexBalance.mul(actualRatio) >> 128));
   }
 
   /**

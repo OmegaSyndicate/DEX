@@ -22,7 +22,7 @@ const { expect, assert } = require('chai');
 const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
-contract('LiquidityAdd', accounts => {
+contract('AddMultipleTokens', accounts => {
   const [owner, trader_eth, trader_A, trader_B, trader_Z, founder] = accounts;
 
   before(async () => {
@@ -121,6 +121,7 @@ contract('LiquidityAdd', accounts => {
       )
     );
 
+    // Check one of each group
     balance = await web3.eth.getBalance(dex);
     expect(balance).to.be.bignumber.equal('15000000000000000000');
     balance = await tokenA.balanceOf(dex);
@@ -132,6 +133,7 @@ contract('LiquidityAdd', accounts => {
     balance = await dfpGov.balanceOf(dex);
     expect(balance).to.be.bignumber.equal('1500000000000000000000000');
 
+    // Check one of each group
     balance = await tokenA.balanceOf(owner);
     expect(balance).to.be.bignumber.equal('985000000000000000000000');
     balance = await tokenI.balanceOf(owner);

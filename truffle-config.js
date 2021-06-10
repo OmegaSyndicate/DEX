@@ -25,7 +25,8 @@
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 //const providerFactory = require("truffle-ledger-wallet-provider").default;
 //require("regenerator-runtime/runtime");
-
+require('dotenv').config();
+mainForkURL = process.env.TRUFFLE_TEAMS_URL;
 //const LedgerWalletProvider = require('@umaprotocol/truffle-ledger-provider');
 //const mainForkURL = 'https://sandbox.truffleteams.com/04164073-6a47-4d82-b684-cb5f0fa622ab';
 //const ledgerOptions = {
