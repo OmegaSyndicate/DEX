@@ -193,7 +193,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     override
     returns (uint256 actualLP)
   {
-    // Perform validity checks
+    // Perform basic checks
     Config memory _config = DFP_config;
     require(_config.unlocked, "DFP: Locked");
     require(tokens.length == 16, "DFP: Bad tokens array length");
@@ -295,6 +295,46 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // emitting events costs gas, but I feel it is needed to allow informed governance decisions
     emit LiquidityRemoved(msg.sender, outputToken, actualOutput, LPamount);
   }
+
+  function removeMultiple(uint256 LPamount, address[] calldata tokens)
+    external
+    override
+    returns (bool success)
+  {
+    // Perform basic checks
+    Config memory _config = DFP_config;
+    require(_config.unlocked, "DFP: Locked");
+    require(tokens.length == 16, "DFP: Bad tokens array length");
+
+    // Calculate fraction of total liquidity to be returned
+    uint256 fraction = (LPamount << 128) / _totalSupply;
+
+    // Send the ETH first (use transfer to prevent reentrancy)
+    uint256 dexBalance = address(this).balance;
+    address payable sender = msg.sender;
+    sender.transfer(fraction * dexBalance >> 128);
+
+    // Send the ERC20 tokens
+    address previous;
+    for (uint256 i = 1; i < 16; i++) {
+      address token = tokens[i];
+      require(token > previous, "DFP: Require ordered list");
+      require(
+        listedTokens[token].state > State.Delisting,
+        "DFP: Token not listed"
+      );
+      dexBalance = IERC20(token).balanceOf(address(this));
+      IERC20(token).transfer(msg.sender, fraction * dexBalance >> 128);
+      previous = token;
+    }
+
+    // Burn the LPs
+    _burn(msg.sender, LPamount);
+
+    // That's all folks
+    return true;
+  }
+
 
   /** When a token is delisted and another one gets listed in its place, the users can
       call this function to provide liquidity for the new token in exchange for the old

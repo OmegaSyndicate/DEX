@@ -62,16 +62,16 @@ contract('AddMultipleTokens', accounts => {
     await dfpGov.transfer(defiPlaza.address, 1000000n * ONE, { from : founder });
     await dfpGov.transfer(owner, 4000000n * ONE, { from : founder });
     await defiPlaza.unlockExchange();
-  });
 
-  it('correctly processes multitoken add', async () => {
     tokens = [constants.ZERO_ADDRESS,
       tokenA.address.toLowerCase(), tokenB.address.toLowerCase(), tokenC.address.toLowerCase(),
       tokenD.address.toLowerCase(), tokenE.address.toLowerCase(), tokenF.address.toLowerCase(),
       tokenG.address.toLowerCase(), tokenH.address.toLowerCase(), tokenI.address.toLowerCase(),
       tokenJ.address.toLowerCase(), tokenK.address.toLowerCase(), tokenL.address.toLowerCase(),
       tokenM.address.toLowerCase(), tokenN.address.toLowerCase(), dfpGov.address.toLowerCase()].sort();
+  });
 
+  it('correctly processes multitoken add', async () => {
     let amounts = new Map();
     amounts.set(constants.ZERO_ADDRESS, 20n*ONE);
     amounts.set(tokenA.address.toLowerCase(), 10000n*ONE);
@@ -145,6 +145,40 @@ contract('AddMultipleTokens', accounts => {
 
     balance = await defiPlaza.balanceOf(owner);
     expect(balance).to.be.bignumber.equal('2400000000000000000000');
+  });
+
+  it('correctly processes multitoken withdrawal', async () => {
+    await truffleCost.log(
+      defiPlaza.removeMultiple(
+        800n * ONE,
+        tokens
+      )
+    );
+
+    // Check one of each group
+    balance = await web3.eth.getBalance(dex);
+    expect(balance).to.be.bignumber.equal('10000000000000000001');
+    balance = await tokenA.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('10000000000000000000001');
+    balance = await tokenI.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('5000000000000000000001');
+    balance = await tokenM.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('20000000000000000000001');
+    balance = await dfpGov.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('1000000000000000000000001');
+
+    // Check one of each group
+    balance = await tokenA.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('989999999999999999999999');
+    balance = await tokenI.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('994999999999999999999999');
+    balance = await tokenM.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('979999999999999999999999');
+    balance = await dfpGov.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('3999999999999999999999999');
+
+    balance = await defiPlaza.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('1600000000000000000000');
   });
 
   it('rejects liquidity when locked', async () => {

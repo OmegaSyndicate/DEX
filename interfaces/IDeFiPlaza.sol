@@ -27,6 +27,11 @@ interface IDeFiPlaza {
     uint256 minOutputAmount
   ) external returns (uint256 actualOutput);
 
+  function removeMultiple(
+    uint256 LPamount,
+    address[] calldata tokens
+  ) external returns (bool success);
+
   function bootstrapNewToken(
     address inputToken,
     uint256 maxInputAmount,
