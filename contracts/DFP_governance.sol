@@ -44,7 +44,7 @@ contract DFPgov is ERC20, Ownable {
     state.startTime = 1623708000;  // 15th of June 2021 00:00
     stakingState = state;
 
-    _mint(founderAddress, 5e24);
+    _mint(founderAddress, 4e24);
   }
 
   function stake(uint96 LPamount)
@@ -137,6 +137,7 @@ contract DFPgov is ERC20, Ownable {
   {
     require(indexToken==address(0), "Already configured");
     indexToken = indexTokenAddress;
+    _mint(indexTokenAddress, 1e24);
     return true;
   }
 

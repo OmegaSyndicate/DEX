@@ -30,7 +30,7 @@ const mainForkURL = process.env.TRUFFLE_TEAMS_URL;
 providerConfig = {
   mnemonic : mnemonicPhrase,
   providerOrUrl : mainForkURL,
-  numberOfAddresses: 1,
+  numberOfAddresses: 2,
   addressIndex: 0
 }
 
