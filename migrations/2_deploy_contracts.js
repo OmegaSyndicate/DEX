@@ -13,7 +13,7 @@ const TokenL = artifacts.require("TokenL");
 const TokenM = artifacts.require("TokenM");
 const TokenN = artifacts.require("TokenN");
 const TokenZ = artifacts.require("TokenZ");
-const DeFiPlaza = artifacts.require("XDP1");
+const DeFiPlaza = artifacts.require("DeFiPlaza");
 const DFPgov = artifacts.require("DFPgov");
 
 module.exports = function(deployer, network, accounts) {
@@ -26,7 +26,7 @@ module.exports = function(deployer, network, accounts) {
         await deployer.deploy(DFPgov, "0x2f7ab204f3675353F37c70f180944a65b9890a9a");
         tokens = Object.values(addresses);
         tokens.push(DFPgov.address.toLowerCase());
-        await deployer.deploy(DeFiPlaza, tokens.sort());
+        await deployer.deploy(DeFiPlaza, tokens.sort(), "DeFi Plaza Main Index", "XDP1");
         break;
 
       default:  // All other networks are test networks requiring test token config
@@ -51,7 +51,7 @@ module.exports = function(deployer, network, accounts) {
           TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
           TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
           TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
-        await deployer.deploy(DeFiPlaza, tokens.sort());
+        await deployer.deploy(DeFiPlaza, tokens.sort(), "DeFi Plaza Main Index", "XDP1");
     }
   });
 };

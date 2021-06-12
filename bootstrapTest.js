@@ -6,6 +6,7 @@ const { BN, constants, expectRevert, time } = require('@openzeppelin/test-helper
 const ONE = 1000000000000000000n
 const pairABI = require("./external/UniV2pairABI.json");
 const routerABI = require("./external/UniV2routerABI.json");
+const weth = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 const dex = DeFiPlaza.address;
 
 /**
@@ -16,12 +17,12 @@ const dex = DeFiPlaza.address;
      console.log("You don't want this on the live network");
      done();
    }
-
+   
    try {
      dfpGov = await DFPgov.deployed();
      defiPlaza = await DeFiPlaza.deployed();
      tokens = require('./tokens.json');
-     wallets = await web3.eth.getAccounts(); //web3.eth.accounts.wallet._accounts._provider.addresses[0];
+     wallets = await web3.eth.getAccounts();
      uniRouter = new web3.eth.Contract(routerABI, "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D");
 
      // Set DEX address in staking contract

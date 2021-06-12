@@ -3,12 +3,12 @@ pragma solidity ^0.7.6;
 
 import "../interfaces/IDeFiPlaza.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./derived/ERC20Lean.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/*
-	DeFi Plaza is a single controct, multi token DEX which allows trades between any two tokens.
-    Trades between two tokens always follow the familiar localized bonding curve x*y=k
+/**
+ * DeFi Plaza is a single controct, multi token DEX which allows trades between any two tokens.
+ * Trades between two tokens always follow the familiar localized bonding curve x*y=k
  */
 contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   using SafeMath for uint256;
@@ -180,14 +180,14 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     X_ = X_ * X;                                       // X^6   0.192 bits
     R_ = R_ - (X_ * 2417163 >> 156);                   // R6    0.64 bits
 
-    actualLP = R_ * _totalSupply >> 64;
+    actualLP = R_ * totalSupply() >> 64;
     require(actualLP > minLP, "DFP: No deal");
     _mint(msg.sender, actualLP);
     // emitting events costs gas, but I feel it is needed to allow informed governance decisions
     emit LiquidityAdded(msg.sender, inputToken, inputAmount, actualLP);
   }
 
-  function addMultiple(address[] calldata tokens, uint256[] calldata maxAmounts, uint256 minLP)
+  function addMultiple(address[] calldata tokens, uint256[] calldata maxAmounts)
     external
     payable
     override
@@ -225,8 +225,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
 
     // Calculate how many LP will be generated
-    actualLP = actualRatio.mul(_totalSupply) >> 128;
-    require(actualLP > minLP, "DFP: No deal");
+    actualLP = actualRatio.mul(totalSupply()) >> 128;
 
     // Collect ERC20 tokens
     previous = address(0);
@@ -277,7 +276,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
     // Actual amount of output token calculation.
     uint256 F_;
-    F_ = (1 << 64) - (LPamount << 64) / _totalSupply;   // (1-R)      (0.64 bits)
+    F_ = (1 << 64) - (LPamount << 64) / totalSupply();   // (1-R)      (0.64 bits)
     F_ = F_ * F_;                                       // (1-R)^2    (0.128 bits)
     F_ = F_ * F_ >> 192;                                // (1-R)^4    (0.64 bits)
     F_ = F_ * F_;                                       // (1-R)^8    (0.128 bits)
@@ -307,7 +306,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     require(tokens.length == 16, "DFP: Bad tokens array length");
 
     // Calculate fraction of total liquidity to be returned
-    uint256 fraction = (LPamount << 128) / _totalSupply;
+    uint256 fraction = (LPamount << 128) / totalSupply();
 
     // Send the ETH first (use transfer to prevent reentrancy)
     uint256 dexBalance = address(this).balance;

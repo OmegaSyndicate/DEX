@@ -17,8 +17,7 @@ interface IDeFiPlaza {
 
   function addMultiple(
     address[] calldata tokens,
-    uint256[] calldata maxAmounts,
-    uint256 minLP
+    uint256[] calldata maxAmounts
   ) external payable returns (uint256 actualLP);
 
   function removeLiquidity(

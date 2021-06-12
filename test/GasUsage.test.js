@@ -1,4 +1,4 @@
-const DeFiPlaza = artifacts.require('XDP1');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');

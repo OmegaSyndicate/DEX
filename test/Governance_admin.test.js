@@ -1,7 +1,7 @@
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
-const DeFiPlaza = artifacts.require('XDP1');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const DFPgov = artifacts.require('DFPgov');
 
 const truffleCost = require('truffle-cost');
@@ -124,3 +124,4 @@ contract('Admin features of governance contract', accounts => {
     expect(balance).to.be.bignumber.equal('5000000000000000000000000'); // all
   });
 });
+DeFiPlaza

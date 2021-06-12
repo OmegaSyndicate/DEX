@@ -1,4 +1,4 @@
-const DeFiPlaza = artifacts.require('XDP1');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const DFPgov = artifacts.require('DFPgov');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
@@ -116,7 +116,6 @@ contract('AddMultipleTokens', accounts => {
       defiPlaza.addMultiple(
         tokens,
         maxAmounts,
-        0n,
         { value :  Number(maxAmounts[0]) }
       )
     );
