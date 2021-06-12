@@ -115,12 +115,12 @@ contract('Admin features of governance contract', accounts => {
       "Too much man"
     );
     balance = await dfpGov.balanceOf(founder);
-    expect(balance).to.be.bignumber.equal('5000000000000000000000000'); // these were issued at construction
+    expect(balance).to.be.bignumber.equal('4000000000000000000000000'); // these were issued at construction
   });
 
-    it('multisig final amount is correct', async () => {
-      await dfpGov.claimMultisigAllocation();
-      balance = await dfpGov.balanceOf(multisig);
-      expect(balance).to.be.bignumber.equal('5000000000000000000000000'); // all
-    });
+  it('multisig final amount is correct', async () => {
+    await dfpGov.claimMultisigAllocation();
+    balance = await dfpGov.balanceOf(multisig);
+    expect(balance).to.be.bignumber.equal('5000000000000000000000000'); // all
+  });
 });

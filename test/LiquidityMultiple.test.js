@@ -45,6 +45,7 @@ contract('AddMultipleTokens', accounts => {
     dex = defiPlaza.address;
 
     await defiPlaza.send(10e18);
+    await dfpGov.setIndexToken(dex);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenB.transfer(defiPlaza.address, 10000n * ONE);
     await tokenC.transfer(defiPlaza.address, 10000n * ONE);
@@ -59,7 +60,6 @@ contract('AddMultipleTokens', accounts => {
     await tokenL.transfer(defiPlaza.address, 5000n * ONE);
     await tokenM.transfer(defiPlaza.address, 20000n * ONE);
     await tokenN.transfer(defiPlaza.address, 20000n * ONE);
-    await dfpGov.transfer(defiPlaza.address, 1000000n * ONE, { from : founder });
     await dfpGov.transfer(owner, 4000000n * ONE, { from : founder });
     await defiPlaza.unlockExchange();
 
