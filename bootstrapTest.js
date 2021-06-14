@@ -1,4 +1,4 @@
-const DeFiPlaza = artifacts.require('XDP1');
+const DeFiPlaza = artifacts.require('DeFiPlaza');
 const DFPgov = artifacts.require('DFPgov');
 
 //const test = require('./tokens.json');
@@ -17,7 +17,7 @@ const dex = DeFiPlaza.address;
      console.log("You don't want this on the live network");
      done();
    }
-   
+
    try {
      dfpGov = await DFPgov.deployed();
      defiPlaza = await DeFiPlaza.deployed();

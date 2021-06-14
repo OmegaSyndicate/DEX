@@ -27,10 +27,19 @@ require('dotenv').config();
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const mnemonicPhrase = process.env.MNEMONIC;
 const mainForkURL = process.env.TRUFFLE_TEAMS_URL;
-providerConfig = {
+const ropstenURL = process.env.ROPSTEN_URL;
+const etherbaseKey = process.env.ETHERBASE_KEY;
+
+mainForkConfig = {
   mnemonic : mnemonicPhrase,
   providerOrUrl : mainForkURL,
   numberOfAddresses: 2,
+  addressIndex: 0
+}
+ropstenConfig = {
+  mnemonic : mnemonicPhrase,
+  providerOrUrl : ropstenURL,
+  numberOfAddresses: 10,
   addressIndex: 0
 }
 
@@ -52,16 +61,22 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
-     ganache: {
+   ganache: {
      host: "127.0.0.1",     // Localhost (default: none)
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
-     },
+   },
 
-     sandbox: {
-     provider: () => new HDWalletProvider(providerConfig),
+   sandbox: {
+     provider: () => new HDWalletProvider(mainForkConfig),
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
+   },
+
+   ropsten: {
+     provider: () => new HDWalletProvider(ropstenConfig),
+     port: 7547,
+     network_id: 3,
    }
     // Another network with more advanced options...
     // advanced: {
@@ -119,5 +134,13 @@ module.exports = {
 
   db: {
     enabled: false
-  }
+  },
+
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+
+  api_keys: {
+    etherscan: etherbaseKey
+  },
 };
