@@ -410,6 +410,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       listedTokens[inputToken] = tokenToList;
       delete listedTokens[outputToken];
       delete listingUpdate;
+      DFP_config.delistingBonus = 0;
       emit BootstrapCompleted(outputToken, inputToken);
     }
   }
@@ -441,6 +442,23 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     _token.listingTarget = listingTarget;
     listedTokens[tokenToList] = _token;
     listedTokens[tokenToDelist].state = State.Delisting;
+  }
+
+  /**
+  * Sets trading fee (actually calculates using 1-fee) as a 0.64 fixed point number.
+  */
+  function setTradingFee(uint64 oneMinusFee) external onlyOwner() {
+    DFP_config.oneMinusTradingFee = oneMinusFee;
+  }
+
+  /**
+  * Sets delisting bonus as emergency measure to complete a (de)listing when it gets stuck.
+  */
+  function setDeListingBonus(uint40 delistingBonus) external onlyOwner() {
+    ListingUpdate memory update = listingUpdate;
+    require(update.tokenToDelist != address(0), "DFP: No active delisting");
+
+    DFP_config.delistingBonus = delistingBonus;
   }
 
   /**
