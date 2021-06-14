@@ -247,7 +247,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
 
     // Calculate how many LP will be generated
-    actualLP = actualRatio.mul(totalSupply()) >> 128;
+    actualLP = (actualRatio.mul(totalSupply()) >> 64) * DFP_config.oneMinusTradingFee >> 128;
 
     // Collect ERC20 tokens
     previous = address(0);
@@ -322,9 +322,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     override
     returns (bool success)
   {
-    // Perform basic checks
-    Config memory _config = DFP_config;
-    require(_config.unlocked, "DFP: Locked");
+    // Perform basic validation (no lock check here on purpose)
     require(tokens.length == 16, "DFP: Bad tokens array length");
 
     // Calculate fraction of total liquidity to be returned
