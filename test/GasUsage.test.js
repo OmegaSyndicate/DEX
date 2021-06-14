@@ -1,9 +1,20 @@
 const DeFiPlaza = artifacts.require('DeFiPlaza');
+const DFPgov = artifacts.require('DFPgov');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
 const TokenD = artifacts.require('TokenD');
-const DFPgov = artifacts.require('DFPgov');
+const TokenE = artifacts.require('TokenE');
+const TokenF = artifacts.require('TokenF');
+const TokenG = artifacts.require('TokenG');
+const TokenH = artifacts.require('TokenH');
+const TokenI = artifacts.require('TokenI');
+const TokenJ = artifacts.require('TokenJ');
+const TokenK = artifacts.require('TokenK');
+const TokenL = artifacts.require('TokenL');
+const TokenM = artifacts.require('TokenM');
+const TokenN = artifacts.require('TokenN');
+const TokenZ = artifacts.require('TokenZ');
 
 const truffleCost = require('truffle-cost');
 const { BN, constants, expectEvent, expectRevert, time} = require('@openzeppelin/test-helpers');
@@ -12,26 +23,46 @@ const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
 contract('GasUsage', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_D] = accounts;
+  const [owner, trader_eth, trader_A, trader_B, trader_C, founder] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
     tokenB = await TokenB.deployed()
     tokenC = await TokenC.deployed()
     tokenD = await TokenD.deployed()
+    tokenE = await TokenE.deployed();
+    tokenF = await TokenF.deployed();
+    tokenG = await TokenG.deployed();
+    tokenH = await TokenH.deployed();
+    tokenI = await TokenI.deployed();
+    tokenJ = await TokenJ.deployed();
+    tokenK = await TokenK.deployed();
+    tokenL = await TokenL.deployed();
+    tokenM = await TokenM.deployed();
+    tokenN = await TokenN.deployed();
     defiPlaza = await DeFiPlaza.deployed();
     dfpGov = await DFPgov.deployed();
     startState = await dfpGov.stakingState();
 
     await defiPlaza.send(10e18);
+    await dfpGov.setIndexToken(defiPlaza.address);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
-    await tokenB.transfer(defiPlaza.address, 20000n * ONE);
-    await tokenC.transfer(defiPlaza.address, 50000n * ONE);
-    await tokenD.transfer(defiPlaza.address, 100000n * ONE);
+    await tokenB.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenC.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenD.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenE.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenF.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenG.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenH.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenI.transfer(defiPlaza.address, 5000n * ONE);
+    await tokenJ.transfer(defiPlaza.address, 5000n * ONE);
+    await tokenK.transfer(defiPlaza.address, 5000n * ONE);
+    await tokenL.transfer(defiPlaza.address, 5000n * ONE);
+    await tokenM.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenN.transfer(defiPlaza.address, 20000n * ONE);
     await defiPlaza.unlockExchange();
 
     await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256);
-    await dfpGov.setIndexToken(defiPlaza.address);
   });
 
   it('swap ETH to A high gas usage (no A yet)', async () => {
@@ -318,6 +349,67 @@ contract('GasUsage', accounts => {
       dfpGov.unstake(
         stakerData.stake,
         { from : trader_A }
+      )
+    );
+  });
+
+  it('add multiple tokens', async () => {  // Relatively small variance so only one test here.
+    tokens = [constants.ZERO_ADDRESS,
+      tokenA.address.toLowerCase(), tokenB.address.toLowerCase(), tokenC.address.toLowerCase(),
+      tokenD.address.toLowerCase(), tokenE.address.toLowerCase(), tokenF.address.toLowerCase(),
+      tokenG.address.toLowerCase(), tokenH.address.toLowerCase(), tokenI.address.toLowerCase(),
+      tokenJ.address.toLowerCase(), tokenK.address.toLowerCase(), tokenL.address.toLowerCase(),
+      tokenM.address.toLowerCase(), tokenN.address.toLowerCase(), dfpGov.address.toLowerCase()].sort();
+
+    maxAmounts = [];
+    for (i = 0; i < 16; i++) {
+      maxAmounts.push(1n * ONE);
+    }
+
+    await tokenA.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenB.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenC.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenD.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenE.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenF.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenG.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenH.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenI.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenJ.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenK.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenL.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenM.approve(defiPlaza.address, constants.MAX_UINT256);
+    await tokenN.approve(defiPlaza.address, constants.MAX_UINT256);
+    await dfpGov.approve(defiPlaza.address, constants.MAX_UINT256);
+    await dfpGov.transfer(owner, 1000000n * ONE, { from: founder });
+
+    await truffleCost.log(
+      defiPlaza.addMultiple(
+        tokens,
+        maxAmounts,
+        { value :  Number(maxAmounts[0]) }
+      )
+    );
+  });
+
+  it('remove multiple tokens high (no balances yet)', async () => {
+    await defiPlaza.transfer(founder, 2n * ONE);
+
+    await truffleCost.log(
+      defiPlaza.removeMultiple(
+        1n * ONE,
+        tokens,
+        { from: founder }
+      )
+    );
+  });
+
+  it('remove multiple tokens low (has balances)', async () => {
+    await truffleCost.log(
+      defiPlaza.removeMultiple(
+        1n * ONE,
+        tokens,
+        { from: founder }
       )
     );
   });
