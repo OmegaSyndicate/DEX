@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
+import "../interfaces/IDeFiPlazaGov.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -11,11 +12,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @author Jazzer 9F
  * @notice Implements lean on gas liquidity reward program for DeFi Plaza
  */
-contract DFPgov is ERC20, Ownable {
+contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
   using SafeMath for uint256;
-
-  event staked(address staker, uint256 LPamount);
-  event unstaked(address staker, uint256 LPamount, uint256 rewards);
 
   struct StakingState {
     uint96 totalStake;                      // Total LP tokens currently staked
@@ -49,6 +47,7 @@ contract DFPgov is ERC20, Ownable {
 
   function stake(uint96 LPamount)
     external
+    override
     returns(bool success)
   {
     require(
@@ -82,12 +81,13 @@ contract DFPgov is ERC20, Ownable {
     }
     stakerData[msg.sender] = staker;
 
-    emit staked(msg.sender, LPamount);
+    emit Staked(msg.sender, LPamount);
     return true;
   }
 
   function unstake(uint96 LPamount)
     external
+    override
     returns(uint256 rewards)
   {
     StakeData memory staker = stakerData[msg.sender];
@@ -119,7 +119,7 @@ contract DFPgov is ERC20, Ownable {
 
     _mint(msg.sender, rewards);
     IERC20(indexToken).transfer(msg.sender, LPamount);
-    emit unstaked(msg.sender, LPamount, rewards);
+    emit Unstaked(msg.sender, LPamount, rewards);
   }
 
   function setMultisigAddress(address multisigAddress)
