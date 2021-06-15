@@ -62,7 +62,7 @@ interface IDeFiPlaza {
   event MultiLiquidityAdded(
     address sender,
     uint256 LPs,
-    uint256 factor
+    uint256 totalLPafter
   );
 
   event LiquidityRemoved(
@@ -75,7 +75,7 @@ interface IDeFiPlaza {
   event MultiLiquidityRemoved(
     address sender,
     uint256 LPs,
-    uint256 fraction
+    uint256 totalLPafter
   );
 
   event Bootstrapped(

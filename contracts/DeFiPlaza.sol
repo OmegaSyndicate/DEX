@@ -263,6 +263,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
     // Mint the LP tokens
     _mint(msg.sender, actualLP);
+    emit MultiLiquidityAdded(msg.sender, actualLP, totalSupply());
 
     // Refund ETH change
     dexBalance = address(this).balance - msg.value;
@@ -317,6 +318,10 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     emit LiquidityRemoved(msg.sender, outputToken, actualOutput, LPamount);
   }
 
+  /**
+  * Multi-token liquidity removal. More economic for large amounts of liquidity.
+  * Returns all 16 listed tokens in ratio and burns the LPs accordingly.
+  */
   function removeMultiple(uint256 LPamount, address[] calldata tokens)
     external
     override
@@ -349,6 +354,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
     // Burn the LPs
     _burn(msg.sender, LPamount);
+    emit MultiLiquidityRemoved(msg.sender, LPamount, totalSupply());
 
     // That's all folks
     return true;
