@@ -396,7 +396,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     IERC20(outputToken).transfer(msg.sender, outputAmount);
 
     // Emit event for better governance decisions
-    emit LiquidityBootstrapped(
+    emit Bootstrapped(
       msg.sender,
       inputToken,
       actualInputAmount,
@@ -413,6 +413,20 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       DFP_config.delistingBonus = 0;
       emit BootstrapCompleted(outputToken, inputToken);
     }
+  }
+
+  function bootstrapNewTokenWithBonus(
+    address inputToken,
+    uint256 maxInputAmount,
+    address outputToken,
+    address bonusToken
+  ) external override returns (uint256 outputAmount) {
+    require(
+      bonusToken == address(0) || listedTokens[bonusToken].state > State.Delisting,
+      "DFP: Invalid bonus token"
+    );
+
+
   }
 
   /**

@@ -39,7 +39,7 @@ const dex = DeFiPlaza.address;
      await web3.eth.sendTransaction({ from: wallets[1], to: dex, value: 4e18});
      for (const [key, value] of Object.entries(tokens)) {
        console.log("Bootstrapping liquidity for", key);
-       await uniRouter.methods.swapExactETHForTokens(0,[weth, value], dex, 1937858400).send({ from: wallets[1], value: 4e18 });
+       await uniRouter.methods.swapExactETHForTokens(0,[weth, value], dex, 1937858400).send({ from: wallets[2], value: 4e18 });
      }
 
      // Unlock Exchange

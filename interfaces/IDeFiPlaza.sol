@@ -37,6 +37,13 @@ interface IDeFiPlaza {
     address outputToken
   ) external returns (uint256 outputAmount);
 
+  function bootstrapNewTokenWithBonus(
+    address inputToken,
+    uint256 maxInputAmount,
+    address outputToken,
+    address bonusToken
+  ) external returns (uint256 outputAmount);
+
   event Swapped(
     address sender,
     address inputToken,
@@ -52,6 +59,12 @@ interface IDeFiPlaza {
     uint256 LPs
   );
 
+  event MultiLiquidityAdded(
+    address sender,
+    uint256 LPs,
+    uint256 factor
+  );
+
   event LiquidityRemoved(
     address recipient,
     address token,
@@ -59,13 +72,30 @@ interface IDeFiPlaza {
     uint256 LPs
   );
 
-  event LiquidityBootstrapped(
+  event MultiLiquidityRemoved(
+    address sender,
+    uint256 LPs,
+    uint256 fraction
+  );
+
+  event Bootstrapped(
     address sender,
     address inputToken,
     uint256 inputAmount,
     address outputToken,
     uint256 outputAmount
   );
+
+  event BootstrappedWithBonus(
+    address sender,
+    address inputToken,
+    uint256 inputAmount,
+    address outputToken,
+    uint256 outputAmount,
+    address bonusToken,
+    uint256 bonusAmount
+  );
+
 
   event BootstrapCompleted(
     address delistedToken,
