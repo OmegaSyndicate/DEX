@@ -425,8 +425,61 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       bonusToken == address(0) || listedTokens[bonusToken].state > State.Delisting,
       "DFP: Invalid bonus token"
     );
+/*
+    // Calculate how many tokens to actually take in (clamp at max available)
+    uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
+    uint256 availableAmount = tokenToList.listingTarget - initialInputBalance;
+    uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
+
+    // Actually pull the tokens in
+    require(
+      IERC20(inputToken).transferFrom(msg.sender, address(this), actualInputAmount),
+      "DFP: token transfer failed"
+    );
+
+    // Check whether the output token requested is indeed being delisted
+    TokenSettings memory tokenToDelist = listedTokens[outputToken];
+    require(
+      tokenToDelist.state == State.Delisting,
+      "DFP: Wrong token"
+    );
+
+    // Check how many of the output tokens should be given out and transfer those
+    uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
+    outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
+    IERC20(outputToken).transfer(msg.sender, outputAmount);
+
+    // Add bonus tokens
+    uint256 bonusBase = actualInputAmount.mul(DFP_config.delistingBonus) / tokenToList.listingTarget;
+    if (bonusToken.address == address(0)) { //bonus in ETH
+      uint256 bonusBalance = address(this).balance;
+      uint256 bonusTokens = actualInputAmount.mul(bonusBalance) / tokenToList.listingTarget;
+      address payable sender = msg.sender;
+      sender.transfer(fraction * dexBalance >> 128);
+    } else {
+      //ERC20
+    }
 
 
+    // Emit event for better governance decisions
+    emit Bootstrapped(
+      msg.sender,
+      inputToken,
+      actualInputAmount,
+      outputToken,
+      outputAmount
+    );
+
+    // If the input token liquidity is now at the target we complete the (de)listing
+    if (actualInputAmount == availableAmount) {
+      tokenToList.state = State.Listed;
+      listedTokens[inputToken] = tokenToList;
+      delete listedTokens[outputToken];
+      delete listingUpdate;
+      DFP_config.delistingBonus = 0;
+      emit BootstrapCompleted(outputToken, inputToken);
+    }
+*/
   }
 
   /**

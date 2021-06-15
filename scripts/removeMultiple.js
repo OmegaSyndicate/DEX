@@ -15,11 +15,18 @@ const ONE = 1000000000000000000n
    }
 
    try {
+     wallets = await web3.eth.getAccounts();
      defiPlaza = await DeFiPlaza.deployed();
+     dfpGov = await DFPgov.deployed();
+     const addresses = require("../tokens.json");
+     tokens = Object.values(addresses);
+     tokens.push(DFPgov.address.toLowerCase());
+     tokens.push(constants.ZERO_ADDRESS);
 
      // Claim all tokens
      console.log("Removing all 16 tokens");
-     await defiPlaza.removeMultiple(1n * ONE);
+     balance = await defiPlaza.balanceOf(wallets[0])
+     await defiPlaza.removeMultiple(balance, tokens.sort());
    } catch (e) {
      console.log(e);
    }

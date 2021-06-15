@@ -21,7 +21,7 @@ const dex = DeFiPlaza.address;
    try {
      dfpGov = await DFPgov.deployed();
      defiPlaza = await DeFiPlaza.deployed();
-     tokens = require('./tokens.json');
+     tokens = require('../tokens.json');
      wallets = await web3.eth.getAccounts();
      uniRouter = new web3.eth.Contract(routerABI, "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D");
 

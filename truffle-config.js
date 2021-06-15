@@ -33,7 +33,7 @@ const etherbaseKey = process.env.ETHERBASE_KEY;
 mainForkConfig = {
   mnemonic : mnemonicPhrase,
   providerOrUrl : mainForkURL,
-  numberOfAddresses: 2,
+  numberOfAddresses: 10,
   addressIndex: 0
 }
 ropstenConfig = {
