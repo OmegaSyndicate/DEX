@@ -1,7 +1,19 @@
 const DeFiPlaza = artifacts.require('DeFiPlaza');
+const DFPgov = artifacts.require('DFPgov');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
+const TokenD = artifacts.require('TokenD');
+const TokenE = artifacts.require('TokenE');
+const TokenF = artifacts.require('TokenF');
+const TokenG = artifacts.require('TokenG');
+const TokenH = artifacts.require('TokenH');
+const TokenI = artifacts.require('TokenI');
+const TokenJ = artifacts.require('TokenJ');
+const TokenK = artifacts.require('TokenK');
+const TokenL = artifacts.require('TokenL');
+const TokenM = artifacts.require('TokenM');
+const TokenN = artifacts.require('TokenN');
 const TokenZ = artifacts.require('TokenZ');
 
 const truffleCost = require('truffle-cost');
@@ -14,18 +26,42 @@ contract('Swapping', accounts => {
   const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Z] = accounts;
 
   before(async () => {
-    tokenA = await TokenA.deployed()
-    tokenB = await TokenB.deployed()
-    tokenC = await TokenC.deployed()
-    tokenZ = await TokenZ.deployed()
+    tokenA = await TokenA.deployed();
+    tokenB = await TokenB.deployed();
+    tokenC = await TokenC.deployed();
+    tokenD = await TokenD.deployed();
+    tokenE = await TokenE.deployed();
+    tokenF = await TokenF.deployed();
+    tokenG = await TokenG.deployed();
+    tokenH = await TokenH.deployed();
+    tokenI = await TokenI.deployed();
+    tokenJ = await TokenJ.deployed();
+    tokenK = await TokenK.deployed();
+    tokenL = await TokenL.deployed();
+    tokenM = await TokenM.deployed();
+    tokenN = await TokenN.deployed();
+    tokenZ = await TokenZ.deployed();
+    dfpGov = await DFPgov.deployed();
     defiPlaza = await DeFiPlaza.deployed();
     dex = defiPlaza.address;
 
     await defiPlaza.send(10e18);
+    await dfpGov.setIndexToken(dex);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
     await tokenB.transfer(defiPlaza.address, 20000n * ONE);
     await tokenC.transfer(defiPlaza.address, 50000n * ONE);
-    await tokenZ.transfer(defiPlaza.address, 100000n * ONE);
+    await tokenD.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenE.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenF.transfer(defiPlaza.address, 50000n * ONE);
+    await tokenG.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenH.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenI.transfer(defiPlaza.address, 50000n * ONE);
+    await tokenJ.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenK.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenL.transfer(defiPlaza.address, 50000n * ONE);
+    await tokenM.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenN.transfer(defiPlaza.address, 20000n * ONE);
+    await tokenC.transfer(defiPlaza.address, 50000n * ONE);
     await defiPlaza.unlockExchange();
   });
 
@@ -161,4 +197,173 @@ contract('Swapping', accounts => {
       "DFP: No deal"
     );
   });
+
+  it('swaps ETH to token B', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenB.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenB.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token C', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenC.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenC.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token D', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenD.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenD.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token E', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenE.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenE.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token F', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenF.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenF.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token G', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenG.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenG.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token H', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenH.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenH.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token I', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenI.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenI.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token J', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenJ.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenJ.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token K', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenK.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenK.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token L', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenL.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenL.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token M', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenM.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenM.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to token N', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      tokenN.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await tokenN.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
+  it('swaps ETH to governance token', async () => {
+    await defiPlaza.swap(
+      constants.ZERO_ADDRESS,
+      dfpGov.address,
+      1n*FINNEY,
+      0n,
+      { from : trader_Z , value : 1e15}
+    );
+    balance = await dfpGov.balanceOf(trader_Z);
+    expect(balance).to.be.bignumber.above('0');
+  });
+
 });

@@ -171,7 +171,7 @@ contract('Staking for governance tokens', accounts => {
     expect(returned).to.be.bignumber.equal('16000000000000000000');
     rewards = await dfpGov.balanceOf(owner);
     expect(rewards).to.be.bignumber.at.least('79050397443890274314214463');
-    expect(rewards).to.be.bignumber.lt('79050399000000000000000000'); // some leeway for ±1s execution time differences
+    expect(rewards).to.be.bignumber.lt('79050401000000000000000000'); // some leeway for small execution time differences
   }); //total stake now 1608
 
   it('concludes program correctly', async () => {
