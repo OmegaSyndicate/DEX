@@ -9,20 +9,16 @@ const ONE = 1000000000000000000n
  * Initialization after deploying on main net fork
  */
  module.exports = async function (done) {
-   if (await web3.eth.getChainId() == 1) {
-     console.log("You don't want this on the live network");
-     done();
-   }
-
    try {
      defiPlaza = await DeFiPlaza.deployed();
 
      // Unlock Exchange
      console.log("Unlocking exchange");
      await defiPlaza.unlockExchange();
+     console.log("Completed");
    } catch (e) {
      console.log(e);
+     console.log("Terminating");
    }
-   console.log("Completed");
    done();
  };

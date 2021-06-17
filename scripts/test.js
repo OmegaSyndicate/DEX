@@ -4,6 +4,7 @@ const DFPgov = artifacts.require('DFPgov');
 //const test = require('./tokens.json');
 const { BN, constants, expectRevert, time } = require('@openzeppelin/test-helpers');
 const ONE = 1000000000000000000n
+const FINNEY = 1000000000000000n
 
 /**
  * Initialization after deploying on main net fork
@@ -15,21 +16,15 @@ const ONE = 1000000000000000000n
    }
 
    try {
-     wallets = await web3.eth.getAccounts();
      defiPlaza = await DeFiPlaza.deployed();
-     dfpGov = await DFPgov.deployed();
-     const addresses = require("../tokens.json");
-     tokens = Object.values(addresses);
-     tokens.push(DFPgov.address.toLowerCase());
-     tokens.push(constants.ZERO_ADDRESS);
 
-     console.log("Adding ETH");
-     await defiPlaza.addLiquidity(constants.ZERO_ADDRESS, ONE, 0n, { value: 1e18 });
+     // Swapping ETH to USDC
+     console.log("Swapping ETH to USDC");
+     await defiPlaza.swap(constants.ZERO_ADDRESS, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", 100n*FINNEY, 0n, { value: 1e17 });
 
-     // Claim all tokens
-     console.log("Removing all 16 tokens");
-     balance = await defiPlaza.balanceOf(wallets[0])
-     await defiPlaza.removeMultiple(balance, tokens.sort());
+     // Swapping ETH to USDT
+     console.log("Swapping ETH to USDT");
+     await defiPlaza.swap(constants.ZERO_ADDRESS, "0xdac17f958d2ee523a2206206994597c13d831ec7", 100n*FINNEY, 0n, { value: 1e17});
      console.log("Completed");
    } catch (e) {
      console.log(e);

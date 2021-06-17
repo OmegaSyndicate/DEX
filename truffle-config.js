@@ -67,7 +67,7 @@ module.exports = {
      network_id: "*",       // Any network (default: none)
    },
 
-   sandbox: {
+   mainfork: {
      provider: () => new HDWalletProvider(mainForkConfig),
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
