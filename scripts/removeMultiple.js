@@ -23,6 +23,9 @@ const ONE = 1000000000000000000n
      tokens.push(DFPgov.address.toLowerCase());
      tokens.push(constants.ZERO_ADDRESS);
 
+     console.log("Adding ETH");
+     await defiPlaza.addLiquidity(constants.ZERO_ADDRESS, ONE, 0n, { value: 1e18 });
+
      // Claim all tokens
      console.log("Removing all 16 tokens");
      balance = await defiPlaza.balanceOf(wallets[0])

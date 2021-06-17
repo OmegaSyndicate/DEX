@@ -5,6 +5,7 @@ import "../interfaces/IDeFiPlaza.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /**
  * DeFi Plaza is a single controct, multi token DEX which allows trades between any two tokens.
@@ -13,6 +14,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  */
 contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   using SafeMath for uint256;
+  using SafeERC20 for IERC20;
 
   // States that each token can be in
   enum State {Unlisted, PreListing, Delisting, Listed}
@@ -112,10 +114,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       initialInputBalance = address(this).balance - inputAmount;
     } else {
       initialInputBalance = IERC20(inputToken).balanceOf(address(this));
-      require(
-        IERC20(inputToken).transferFrom(msg.sender, address(this), inputAmount),
-        "DFP: Transfer failed"
-      );
+      IERC20(inputToken).safeTransferFrom(msg.sender, address(this), inputAmount);
     }
 
     // Check dex balance of the output token
@@ -137,7 +136,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       address payable sender = msg.sender;
       sender.transfer(outputAmount);
     } else {
-      IERC20(outputToken).transfer(msg.sender, outputAmount);
+      IERC20(outputToken).safeTransfer(msg.sender, outputAmount);
     }
 
     // Emit swap event to enable better governance decision making
@@ -172,10 +171,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       initialBalance = address(this).balance - inputAmount;
     } else {
       initialBalance = IERC20(inputToken).balanceOf(address(this));
-      require(
-        IERC20(inputToken).transferFrom(msg.sender, address(this), inputAmount),
-        "DFP: Transfer failed"
-      );
+      IERC20(inputToken).safeTransferFrom(msg.sender, address(this), inputAmount);
     }
 
     // Prevent excessive liquidity add which runs of the approximation curve
@@ -254,10 +250,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     for (uint256 i = 1; i < 16; i++) {
       token = tokens[i];
       dexBalance = IERC20(token).balanceOf(address(this));
-      require(
-        IERC20(token).transferFrom(msg.sender, address(this), dexBalance.mul(actualRatio) >> 128),
-        "DFP: token transfer failed"
-      );
+      IERC20(token).safeTransferFrom(msg.sender, address(this), dexBalance.mul(actualRatio) >> 128);
       previous = token;
     }
 
@@ -311,7 +304,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       address payable sender = msg.sender;
       sender.transfer(actualOutput);
     } else {
-      IERC20(outputToken).transfer(msg.sender, actualOutput);
+      IERC20(outputToken).safeTransfer(msg.sender, actualOutput);
     }
 
     // Emitting liquidity removal event to enable better governance decisions
@@ -348,7 +341,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         "DFP: Token not listed"
       );
       dexBalance = IERC20(token).balanceOf(address(this));
-      IERC20(token).transfer(msg.sender, fraction * dexBalance >> 128);
+      IERC20(token).safeTransfer(msg.sender, fraction * dexBalance >> 128);
       previous = token;
     }
 
@@ -384,10 +377,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
 
     // Actually pull the tokens in
-    require(
-      IERC20(inputToken).transferFrom(msg.sender, address(this), actualInputAmount),
-      "DFP: token transfer failed"
-    );
+    IERC20(inputToken).safeTransferFrom(msg.sender, address(this), actualInputAmount);
 
     // Check whether the output token requested is indeed being delisted
     TokenSettings memory tokenToDelist = listedTokens[outputToken];
@@ -399,7 +389,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // Check how many of the output tokens should be given out and transfer those
     uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
     outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
-    IERC20(outputToken).transfer(msg.sender, outputAmount);
+    IERC20(outputToken).safeTransfer(msg.sender, outputAmount);
 
     // Emit event for better governance decisions
     emit Bootstrapped(
@@ -438,10 +428,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
 
     // Actually pull the tokens in
-    require(
-      IERC20(inputToken).transferFrom(msg.sender, address(this), actualInputAmount),
-      "DFP: token transfer failed"
-    );
+    IERC20(inputToken).safeTransferFrom(msg.sender, address(this), actualInputAmount);
 
     // Check whether the output token requested is indeed being delisted
     TokenSettings memory tokenToDelist = listedTokens[outputToken];
@@ -453,7 +440,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // Check how many of the output tokens should be given out and transfer those
     uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
     outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
-    IERC20(outputToken).transfer(msg.sender, outputAmount);
+    IERC20(outputToken).safeTransfer(msg.sender, outputAmount);
 
     // Add bonus tokens
     uint256 bonusBase = actualInputAmount.mul(DFP_config.delistingBonus) / tokenToList.listingTarget;
