@@ -86,16 +86,11 @@ interface IDeFiPlaza {
     uint256 outputAmount
   );
 
-  event BootstrappedWithBonus(
+  event BootstrapBonus(
     address sender,
-    address inputToken,
-    uint256 inputAmount,
-    address outputToken,
-    uint256 outputAmount,
     address bonusToken,
     uint256 bonusAmount
   );
-
 
   event BootstrapCompleted(
     address delistedToken,

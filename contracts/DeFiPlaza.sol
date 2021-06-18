@@ -29,7 +29,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   struct Config {
     bool unlocked;                    // Locked for trading to prevent re-entrancy misery
     uint64 oneMinusTradingFee;        // One minus the swap fee (0.64 fixed point integer)
-    uint40 delistingBonus;            // Amount of additional tokens to encourage immediate delisting (0.40 fixed point)
+    uint64 delistingBonus;            // Amount of additional tokens to encourage immediate delisting (0.64 fixed point)
   }
 
   // Keeps track of whether there is a listing change underway and if so between which tokens
@@ -354,16 +354,17 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   }
 
 
-  /** When a token is delisted and another one gets listed in its place, the users can
-      call this function to provide liquidity for the new token in exchange for the old
-      token. The ratio should be set such that the users have a financial incentive to
-      perform this transaction.
-   */
+  /**
+  * When a token is delisted and another one gets listed in its place, the users can
+  * call this function to provide liquidity for the new token in exchange for the old
+  * token. The ratio should be set such that the users have a financial incentive to
+  * perform this transaction.
+  */
   function bootstrapNewToken(
     address inputToken,
     uint256 maxInputAmount,
     address outputToken
-  ) external override returns (uint256 outputAmount) {
+  ) public override returns (uint256 outputAmount) {
     // Check whether the valid token is being bootstrapped
     TokenSettings memory tokenToList = listedTokens[inputToken];
     require(
@@ -374,6 +375,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // Calculate how many tokens to actually take in (clamp at max available)
     uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
     uint256 availableAmount = tokenToList.listingTarget - initialInputBalance;
+    if (initialInputBalance >= tokenToList.listingTarget) { availableAmount = 1; }
     uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
 
     // Actually pull the tokens in
@@ -411,25 +413,17 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
   }
 
+  /**
+   * Emergency bonus withdrawal when bootstrapping is expected to remain incomplete
+   * A fraction is specified (for example 5%) that is then rewarded in bonus tokens
+   * on top of the regular bootstrapping output tokens.
+   */
   function bootstrapNewTokenWithBonus(
     address inputToken,
     uint256 maxInputAmount,
     address outputToken,
     address bonusToken
-  ) external override returns (uint256 outputAmount) {
-    require(
-      bonusToken == address(0) || listedTokens[bonusToken].state > State.Delisting,
-      "DFP: Invalid bonus token"
-    );
-/*
-    // Calculate how many tokens to actually take in (clamp at max available)
-    uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
-    uint256 availableAmount = tokenToList.listingTarget - initialInputBalance;
-    uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
-
-    // Actually pull the tokens in
-    IERC20(inputToken).safeTransferFrom(msg.sender, address(this), actualInputAmount);
-
+  ) external onlyListedToken(bonusToken) override returns (uint256 bonusAmount) {
     // Check whether the output token requested is indeed being delisted
     TokenSettings memory tokenToDelist = listedTokens[outputToken];
     require(
@@ -437,42 +431,36 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       "DFP: Wrong token"
     );
 
-    // Check how many of the output tokens should be given out and transfer those
+    // Collect parameters required to calculate bonus
+    uint256 bonusFactor = uint256(DFP_config.delistingBonus);
     uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
-    outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
-    IERC20(outputToken).safeTransfer(msg.sender, outputAmount);
+    uint256 outputAmount = bootstrapNewToken(inputToken, maxInputAmount, outputToken);
 
-    // Add bonus tokens
-    uint256 bonusBase = actualInputAmount.mul(DFP_config.delistingBonus) / tokenToList.listingTarget;
-    if (bonusToken.address == address(0)) { //bonus in ETH
-      uint256 bonusBalance = address(this).balance;
-      uint256 bonusTokens = actualInputAmount.mul(bonusBalance) / tokenToList.listingTarget;
-      address payable sender = msg.sender;
-      sender.transfer(fraction * dexBalance >> 128);
+    // Balance of selected bonus token
+    uint256 bonusBalance;
+    if (bonusToken == address(0)) {
+      bonusBalance = address(this).balance;
     } else {
-      //ERC20
+      bonusBalance = IERC20(bonusToken).balanceOf(address(this));
     }
 
+    // Calculate bonus amount
+    bonusAmount = outputAmount.mul(bonusBalance).div(initialOutputBalance).mul(bonusFactor) >> 64;
 
-    // Emit event for better governance decisions
-    emit Bootstrapped(
+    // Payout bonus tokens
+    if (bonusToken == address(0)) {
+      address payable sender = msg.sender;
+      sender.transfer(bonusAmount);
+    } else {
+      IERC20(bonusToken).transfer(msg.sender, bonusAmount);
+    }
+
+    // Emit event to enable data driven governance
+    emit BootstrapBonus(
       msg.sender,
-      inputToken,
-      actualInputAmount,
-      outputToken,
-      outputAmount
+      bonusToken,
+      bonusAmount
     );
-
-    // If the input token liquidity is now at the target we complete the (de)listing
-    if (actualInputAmount == availableAmount) {
-      tokenToList.state = State.Listed;
-      listedTokens[inputToken] = tokenToList;
-      delete listedTokens[outputToken];
-      delete listingUpdate;
-      DFP_config.delistingBonus = 0;
-      emit BootstrapCompleted(outputToken, inputToken);
-    }
-*/
   }
 
   /**

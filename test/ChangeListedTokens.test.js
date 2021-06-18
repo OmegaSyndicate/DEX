@@ -115,12 +115,12 @@ contract('ChangeListedTokens', accounts => {
 
   it('accepts one-shot bootstrapping', async () => {
     await tokenZ.approve(defiPlaza.address, 40000n*ONE, { from : trader_Z })
-    await defiPlaza.bootstrapNewToken(
+    await truffleCost.log(defiPlaza.bootstrapNewToken(
       tokenZ.address,
       40000n * ONE,
       tokenA.address,
       { from: trader_Z }
-    );
+    ));
     update = await defiPlaza.listingUpdate()
     expect(update.tokenToList).to.equal(constants.ZERO_ADDRESS);
     expect(update.tokenToDelist).to.equal(constants.ZERO_ADDRESS);
