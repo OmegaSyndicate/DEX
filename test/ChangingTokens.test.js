@@ -2,8 +2,9 @@ const DeFiPlaza = artifacts.require('DeFiPlaza');
 const TokenA = artifacts.require('TokenA');
 const TokenB = artifacts.require('TokenB');
 const TokenC = artifacts.require('TokenC');
-const TokenZ = artifacts.require('TokenZ');
 const TokenE = artifacts.require('TokenE');
+const TokenY = artifacts.require('TokenY');
+const TokenZ = artifacts.require('TokenZ');
 
 const truffleCost = require('truffle-cost');
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
@@ -11,20 +12,21 @@ const { expect, assert } = require('chai');
 const ONE = 1000000000000000000n
 const FINNEY = 1000000000000000n
 
-contract('ChangeListedTokens', accounts => {
-  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Z, trader_E] = accounts;
+contract('(un)ListingTokens', accounts => {
+  const [owner, trader_eth, trader_A, trader_B, trader_C, trader_Y, trader_Z] = accounts;
 
   before(async () => {
     tokenA = await TokenA.deployed()
     tokenB = await TokenB.deployed()
     tokenC = await TokenC.deployed()
+    tokenY = await TokenY.deployed()
     tokenZ = await TokenZ.deployed()
-    tokenE = await TokenE.deployed()
     defiPlaza = await DeFiPlaza.deployed();
     dex = defiPlaza.address;
 
     await defiPlaza.send(10e18);
     await tokenA.transfer(defiPlaza.address, 10000n * ONE);
+    await tokenB.transfer(defiPlaza.address, 10000n * ONE);
     await tokenZ.transfer(trader_Z, 100000n * ONE);
     await defiPlaza.unlockExchange();
   });
@@ -40,7 +42,7 @@ contract('ChangeListedTokens', accounts => {
     );
   });
 
-  it('rejects delisting non-listed token D', async () => {
+  it('rejects delisting non-listed token Z', async () => {
     await expectRevert(
       defiPlaza.changeListing(
         tokenZ.address,
@@ -63,7 +65,7 @@ contract('ChangeListedTokens', accounts => {
     );
   });
 
-  it('accepts change of A to D', async () => {
+  it('accepts listing Z for A', async () => {
     await defiPlaza.changeListing(
       tokenA.address,
       tokenZ.address,
@@ -78,14 +80,14 @@ contract('ChangeListedTokens', accounts => {
     await expectRevert(
       defiPlaza.changeListing(
         tokenB.address,
-        tokenE.address,
+        tokenY.address,
         20000n * ONE
       ),
       "DFP: Previous update incomplete"
     );
   });
 
-  it('rejects wrong listed bootstrap token C', async () => {
+  it('rejects listed bootstrap token C', async () => {
     await tokenC.transfer(trader_C, 10000n * ONE)
     await tokenC.approve(defiPlaza.address, 10000n*ONE, { from : trader_C })
     await expectRevert(
@@ -99,15 +101,15 @@ contract('ChangeListedTokens', accounts => {
     );
   });
 
-  it('rejects wrong non-listed bootstrap token E', async () => {
-    await tokenE.transfer(trader_E, 10000n * ONE)
-    await tokenE.approve(defiPlaza.address, 10000n*ONE, { from : trader_E })
+  it('rejects non-listed bootstrap token Y', async () => {
+    await tokenY.transfer(trader_Y, 10000n * ONE)
+    await tokenY.approve(defiPlaza.address, 10000n*ONE, { from : trader_Y })
     await expectRevert(
       defiPlaza.bootstrapNewToken(
-        tokenE.address,
+        tokenY.address,
         10000n * ONE,
         tokenA.address,
-        { from: trader_E }
+        { from: trader_Y }
       ),
       "DFP: Wrong token"
     );

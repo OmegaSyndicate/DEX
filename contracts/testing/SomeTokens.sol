@@ -50,6 +50,9 @@ contract TokenM is SomeToken {
 contract TokenN is SomeToken {
   constructor() SomeToken("TokenN", "TOKN") {}
 }
+contract TokenY is SomeToken {
+  constructor() SomeToken("TokenY", "TOKY") {}
+}
 contract TokenZ is SomeToken {
   constructor() SomeToken("TokenZ", "TOKZ") {}
 }

@@ -12,6 +12,7 @@ const TokenK = artifacts.require("TokenK");
 const TokenL = artifacts.require("TokenL");
 const TokenM = artifacts.require("TokenM");
 const TokenN = artifacts.require("TokenN");
+const TokenY = artifacts.require("TokenY");
 const TokenZ = artifacts.require("TokenZ");
 const DeFiPlaza = artifacts.require("DeFiPlaza");
 const DFPgov = artifacts.require("DFPgov");
@@ -44,6 +45,7 @@ module.exports = function(deployer, network, accounts) {
         await deployer.deploy(TokenL);
         await deployer.deploy(TokenM);
         await deployer.deploy(TokenN);
+        await deployer.deploy(TokenY);
         await deployer.deploy(TokenZ);
         await deployer.deploy(DFPgov, accounts[5])
         tokens = [TokenA.address.toLowerCase(), TokenB.address.toLowerCase(), TokenC.address.toLowerCase(),
