@@ -434,7 +434,6 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
     // Collect parameters required to calculate bonus
     uint256 bonusFactor = uint256(DFP_config.delistingBonus);
-    uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
     uint64 fractionBootstrapped = bootstrapNewToken(inputToken, maxInputAmount, outputToken);
 
     // Balance of selected bonus token
