@@ -49,7 +49,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   * Doesn't do any checks. Make sure you ONLY add well behaved ERC20s!!
   */
   constructor(address[] memory tokensToList, string memory name_, string memory symbol_) ERC20(name_, symbol_) {
-    // Basic exchange configureation
+    // Basic exchange configuration
     Config memory config;
     config.unlocked = false;
     config.oneMinusTradingFee = 0xffbe76c8b4395800;   // approximately 0.999
@@ -364,7 +364,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     address inputToken,
     uint256 maxInputAmount,
     address outputToken
-  ) public override returns (uint256 outputAmount) {
+  ) public override returns (uint64 fractionBootstrapped) {
     // Check whether the valid token is being bootstrapped
     TokenSettings memory tokenToList = listedTokens[inputToken];
     require(
@@ -390,8 +390,9 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
     // Check how many of the output tokens should be given out and transfer those
     uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
-    outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
+    uint256 outputAmount = actualInputAmount.mul(initialOutputBalance).div(availableAmount);
     IERC20(outputToken).safeTransfer(msg.sender, outputAmount);
+    fractionBootstrapped = uint64((actualInputAmount << 64) / tokenToList.listingTarget);
 
     // Emit event for better governance decisions
     emit Bootstrapped(
@@ -434,7 +435,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // Collect parameters required to calculate bonus
     uint256 bonusFactor = uint256(DFP_config.delistingBonus);
     uint256 initialOutputBalance = IERC20(outputToken).balanceOf(address(this));
-    uint256 outputAmount = bootstrapNewToken(inputToken, maxInputAmount, outputToken);
+    uint64 fractionBootstrapped = bootstrapNewToken(inputToken, maxInputAmount, outputToken);
 
     // Balance of selected bonus token
     uint256 bonusBalance;
@@ -445,7 +446,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
 
     // Calculate bonus amount
-    bonusAmount = outputAmount.mul(bonusBalance).div(initialOutputBalance).mul(bonusFactor) >> 64;
+    bonusAmount = (uint256(fractionBootstrapped) * bonusFactor).mul(bonusBalance) >> 128;
 
     // Payout bonus tokens
     if (bonusToken == address(0)) {
@@ -502,7 +503,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   /**
   * Sets delisting bonus as emergency measure to complete a (de)listing when it gets stuck.
   */
-  function setDeListingBonus(uint40 delistingBonus) external onlyOwner() {
+  function setDeListingBonus(uint64 delistingBonus) external onlyOwner() {
     ListingUpdate memory update = listingUpdate;
     require(update.tokenToDelist != address(0), "DFP: No active delisting");
 

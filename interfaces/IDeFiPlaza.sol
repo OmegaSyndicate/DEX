@@ -35,14 +35,14 @@ interface IDeFiPlaza {
     address inputToken,
     uint256 maxInputAmount,
     address outputToken
-  ) external returns (uint256 outputAmount);
+  ) external returns (uint64 fractionBootstrapped);
 
   function bootstrapNewTokenWithBonus(
     address inputToken,
     uint256 maxInputAmount,
     address outputToken,
     address bonusToken
-  ) external returns (uint256 outputAmount);
+  ) external returns (uint256 bonusAmount);
 
   event Swapped(
     address sender,
