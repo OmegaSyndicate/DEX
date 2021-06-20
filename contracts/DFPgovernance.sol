@@ -39,7 +39,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
     founder = founderAddress;
 
     StakingState memory state;
-    state.startTime = 1624118400;  // 19th of June 2021 18:00
+    state.startTime = 1624204800;  // 20th of June 2021 18:00 GMT+2
     stakingState = state;
 
     _mint(founderAddress, 4e24);
@@ -83,6 +83,27 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     emit Staked(msg.sender, LPamount);
     return true;
+  }
+
+  function rewardsQuote(address stakerAddress)
+    external
+    view
+    override
+    returns(uint256 rewards)
+  {
+    StakeData memory staker = stakerData[stakerAddress];
+    StakingState memory state = stakingState;
+    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
+      uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
+      uint256 t0 = uint256(state.lastUpdate);
+      t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
+      uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
+      uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / state.totalStake);
+      state.lastUpdate = uint32(t1);
+    }
+
+    rewards = ((uint256(state.rewardsAccumulatedPerLP) - staker.rewardsPerLPAtTimeStaked) * staker.stake) >> 80;
   }
 
   function unstake(uint96 LPamount)
