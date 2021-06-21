@@ -278,5 +278,6 @@ contract('(un)Listing tokens', accounts => {
     expect(await tokenB.balanceOf(trader_Z)).to.be.bignumber.equal('200000000000000011091');
     expect((await defiPlaza.listedTokens(tokenA.address)).state).to.be.bignumber.equal('3');
     expect((await defiPlaza.listedTokens(tokenZ.address)).state).to.be.bignumber.equal('0');
+    expect((await defiPlaza.DFP_config()).delistingBonus).to.be.bignumber.equal('0');
   });
 });

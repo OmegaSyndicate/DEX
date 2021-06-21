@@ -42,6 +42,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   mapping(address => TokenSettings) public listedTokens;
   Config public DFP_config;
   ListingUpdate public listingUpdate;
+  address admin;
 
   /**
   * Sets up default configuration
@@ -81,6 +82,14 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     require(
       token == address(0) || listedTokens[token].state > State.Delisting,
       "DFP: Token not listed"
+    );
+    _;
+  }
+
+  modifier onlyAdmin() {
+    require(
+      msg.sender == admin || msg.sender == owner(),
+      "DFP: admin rights required"
     );
     _;
   }
@@ -510,16 +519,23 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   }
 
   /**
+  * Sets admin address for emergency exchange locking
+  */
+  function setAdmin(address adminAddress) external onlyOwner() {
+    admin = adminAddress;
+  }
+
+  /**
   * Sets exchange lock, under which swap and liquidity add (but not remove) are disabled
   */
-  function lockExchange() external onlyOwner() {
+  function lockExchange() external onlyAdmin() {
     DFP_config.unlocked = false;
   }
 
   /**
   * Resets exchange lock.
   */
-  function unlockExchange() external onlyOwner() {
+  function unlockExchange() external onlyAdmin() {
     DFP_config.unlocked = true;
   }
 }

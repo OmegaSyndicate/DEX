@@ -192,9 +192,21 @@ contract('Staking for governance tokens', accounts => {
     expect(rewards).to.be.bignumber.lt('79050401000000000000000000'); // some leeway for small execution time differences
   }); //total stake now 1608
 
-  it('concludes program correctly', async () => {
-    await time.increaseTo(1937858400); // jump to ten years after program start
+  it('graciously handles adding stake after program ends', async () => {
+    await time.increaseTo(1937858400n); // jump ten years into the future
+    before = await dfpGov.rewardsQuote(owner);
 
+    await dfpGov.stake(
+      4n * ONE,
+      { from: owner }
+    );
+
+    await time.increaseTo(2253477600n); // jump twenty years into the future
+    after = await dfpGov.rewardsQuote(owner);
+    expect(after).to.be.bignumber.equal(before);
+  }); //total stake now 1612
+
+  it('concludes program correctly', async () => {
     await dfpGov.unstake(0n, { from : owner });
     await dfpGov.unstake(0n, { from : staker_1 });
     await dfpGov.unstake(0n, { from : staker_2 });
@@ -203,10 +215,10 @@ contract('Staking for governance tokens', accounts => {
     totalGov = await dfpGov.totalSupply();
     expect(totalGov).to.be.bignumber.at.least('89999999999999999999999997');
     expect(totalGov).to.be.bignumber.at.most('90000000000000000000000000'); // some leeway for ±1s execution time differences
-  });
+  }); //total stake now 1612
 
   it('only distributes rewards once', async () => {
-    await dfpGov.unstake(1584n * ONE, { from : owner });
+    await dfpGov.unstake(1588n * ONE, { from : owner });
     await dfpGov.unstake(8n * ONE, { from : staker_1 });
     await dfpGov.unstake(8n * ONE, { from : staker_2 });
     await dfpGov.unstake(8n * ONE, { from : staker_3 });
@@ -214,5 +226,5 @@ contract('Staking for governance tokens', accounts => {
     totalGov = await dfpGov.totalSupply();
     expect(totalGov).to.be.bignumber.at.least('89999999999999999999999997');
     expect(totalGov).to.be.bignumber.at.most('90000000000000000000000000'); // some leeway for ±1s execution time differences
-  });
+  }); // //total stake now 0
 });

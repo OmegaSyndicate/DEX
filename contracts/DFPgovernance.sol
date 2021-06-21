@@ -39,7 +39,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
     founder = founderAddress;
 
     StakingState memory state;
-    state.startTime = 1624204800;  // 20th of June 2021 18:00 GMT+2
+    state.startTime = 1624356000;  // 22nd of June 2021 12:00 GMT+2
     stakingState = state;
 
     _mint(founderAddress, 4e24);
