@@ -24,12 +24,20 @@
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 require('dotenv').config();
+//const LedgerWalletProvider = require('@umaprotocol/truffle-ledger-provider');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const mnemonicPhrase = process.env.MNEMONIC;
 const mainForkURL = process.env.TRUFFLE_TEAMS_URL;
 const ropstenURL = process.env.ROPSTEN_URL;
 const etherbaseKey = process.env.ETHERBASE_KEY;
-
+/*
+const ledgerOptions = {
+  networkId: 1, // ropsten
+  path: "44'/60'/0'/0",
+  askConfirm: true,
+  accountsLength: 1,
+  accountsOffset: 0,
+};*/
 mainForkConfig = {
   mnemonic : mnemonicPhrase,
   providerOrUrl : mainForkURL,
@@ -75,6 +83,7 @@ module.exports = {
 
    ropsten: {
      provider: () => new HDWalletProvider(ropstenConfig),
+     //provider: () => new LedgerWalletProvider(ledgerOptions, ropstenURL),
      port: 7547,
      network_id: 3,
    }

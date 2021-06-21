@@ -6,13 +6,13 @@ interface IDeFiPlazaGov {
     uint96 LPamount
   ) external returns(bool success);
 
-  function rewardsQuote(
-    address stakerAddress
-  ) external view returns(uint256 rewards);
-
   function unstake(
     uint96 LPamount
   ) external returns(uint256 rewards);
+
+  function rewardsQuote(
+    address stakerAddress
+  ) external view returns(uint256 rewards);
 
   event Staked(
     address staker,

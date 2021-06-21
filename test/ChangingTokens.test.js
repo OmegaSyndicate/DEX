@@ -199,7 +199,7 @@ contract('(un)Listing tokens', accounts => {
   it('accepts bonus change by owner', async () => {
     await defiPlaza.setDeListingBonus(1844674407370955264n); // as close to 10% as possible
 
-    config = await defiPlaza.DFP_config();
+    config = await defiPlaza.DFPconfig();
     expect(config.delistingBonus).to.be.bignumber.equal('1844674407370955264');
   });
 
@@ -209,7 +209,7 @@ contract('(un)Listing tokens', accounts => {
       "Ownable: caller is not the owner"
     );
 
-    config = await defiPlaza.DFP_config();
+    config = await defiPlaza.DFPconfig();
     expect(config.delistingBonus).to.be.bignumber.equal('1844674407370955264');
   });
 
@@ -278,6 +278,6 @@ contract('(un)Listing tokens', accounts => {
     expect(await tokenB.balanceOf(trader_Z)).to.be.bignumber.equal('200000000000000011091');
     expect((await defiPlaza.listedTokens(tokenA.address)).state).to.be.bignumber.equal('3');
     expect((await defiPlaza.listedTokens(tokenZ.address)).state).to.be.bignumber.equal('0');
-    expect((await defiPlaza.DFP_config()).delistingBonus).to.be.bignumber.equal('0');
+    expect((await defiPlaza.DFPconfig()).delistingBonus).to.be.bignumber.equal('0');
   });
 });

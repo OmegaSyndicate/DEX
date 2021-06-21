@@ -8,9 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /**
- * DeFi Plaza is a single controct, multi token DEX which allows trades between any two tokens.
- * Trades between two tokens always follow the familiar localized bonding curve x*y=k
- * The number of tokens used is hardcoded to 16 for efficiency reasons.
+ * @title DeFi Plaza exchange controct, multi token DEX.
+ * @author Jazzer 9F
+ * @notice Trades between two tokens follow the local bonding curve x*y=k
+ * The number of tokens used is hard coded to 16 for efficiency reasons.
  */
 contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   using SafeMath for uint256;
@@ -40,7 +41,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
 
   // Mapping to keep track of the listed tokens
   mapping(address => TokenSettings) public listedTokens;
-  Config public DFP_config;
+  Config public DFPconfig;
   ListingUpdate public listingUpdate;
   address public admin;
 
@@ -55,7 +56,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     config.unlocked = false;
     config.oneMinusTradingFee = 0xffbe76c8b4395800;   // approximately 0.999
     config.delistingBonus = 0;
-    DFP_config = config;
+    DFPconfig = config;
 
     // Configure the listed tokens as such
     TokenSettings memory listed;
@@ -113,7 +114,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     returns (uint256 outputAmount)
   {
     // Check that the exchange is unlocked and thus open for business
-    Config memory _config = DFP_config;
+    Config memory _config = DFPconfig;
     require(_config.unlocked, "DFP: Locked");
 
     // Pull in input token and check the exchange balance for that token
@@ -170,7 +171,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     returns (uint256 actualLP)
   {
     // Check that the exchange is unlocked and thus open for business
-    Config memory _config = DFP_config;
+    Config memory _config = DFPconfig;
     require(_config.unlocked, "DFP: Locked");
 
     // Pull in input token and check the exchange balance for that token
@@ -221,7 +222,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     returns (uint256 actualLP)
   {
     // Perform basic checks
-    Config memory _config = DFP_config;
+    Config memory _config = DFPconfig;
     require(_config.unlocked, "DFP: Locked");
     require(tokens.length == 16, "DFP: Bad tokens array length");
     require(maxAmounts.length == 16, "DFP: Bad maxAmount array length");
@@ -252,7 +253,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
 
     // Calculate how many LP will be generated
-    actualLP = (actualRatio.mul(totalSupply()) >> 64) * DFP_config.oneMinusTradingFee >> 128;
+    actualLP = (actualRatio.mul(totalSupply()) >> 64) * DFPconfig.oneMinusTradingFee >> 128;
 
     // Collect ERC20 tokens
     previous = address(0);
@@ -418,7 +419,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       listedTokens[inputToken] = tokenToList;
       delete listedTokens[outputToken];
       delete listingUpdate;
-      DFP_config.delistingBonus = 0;
+      DFPconfig.delistingBonus = 0;
       emit BootstrapCompleted(outputToken, inputToken);
     }
   }
@@ -442,7 +443,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     );
 
     // Collect parameters required to calculate bonus
-    uint256 bonusFactor = uint256(DFP_config.delistingBonus);
+    uint256 bonusFactor = uint256(DFPconfig.delistingBonus);
     uint64 fractionBootstrapped = bootstrapNewToken(inputToken, maxInputAmount, outputToken);
 
     // Balance of selected bonus token
@@ -505,7 +506,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   * Sets trading fee (actually calculates using 1-fee) as a 0.64 fixed point number.
   */
   function setTradingFee(uint64 oneMinusFee) external onlyOwner() {
-    DFP_config.oneMinusTradingFee = oneMinusFee;
+    DFPconfig.oneMinusTradingFee = oneMinusFee;
   }
 
   /**
@@ -515,7 +516,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     ListingUpdate memory update = listingUpdate;
     require(update.tokenToDelist != address(0), "DFP: No active delisting");
 
-    DFP_config.delistingBonus = delistingBonus;
+    DFPconfig.delistingBonus = delistingBonus;
   }
 
   /**
@@ -529,13 +530,13 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   * Sets exchange lock, under which swap and liquidity add (but not remove) are disabled
   */
   function lockExchange() external onlyAdmin() {
-    DFP_config.unlocked = false;
+    DFPconfig.unlocked = false;
   }
 
   /**
   * Resets exchange lock.
   */
   function unlockExchange() external onlyAdmin() {
-    DFP_config.unlocked = true;
+    DFPconfig.unlocked = true;
   }
 }

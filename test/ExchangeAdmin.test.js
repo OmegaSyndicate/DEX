@@ -58,41 +58,41 @@ contract('Admin features of exchange contract', accounts => {
   });
 
   it('owner can lock exchange', async () => {
-    before = (await defiPlaza.DFP_config()).unlocked;
+    before = (await defiPlaza.DFPconfig()).unlocked;
 
     defiPlaza.lockExchange({ from: owner });
 
-    after = (await defiPlaza.DFP_config()).unlocked;
+    after = (await defiPlaza.DFPconfig()).unlocked;
     expect(before).to.be.true;
     expect(after).to.be.false;
   });
 
   it('owner can unlock exchange', async () => {
-    before = (await defiPlaza.DFP_config()).unlocked;
+    before = (await defiPlaza.DFPconfig()).unlocked;
 
     defiPlaza.unlockExchange({ from: owner });
 
-    after = (await defiPlaza.DFP_config()).unlocked;
+    after = (await defiPlaza.DFPconfig()).unlocked;
     expect(before).to.be.false;
     expect(after).to.be.true;
   });
 
   it('admin can lock exchange', async () => {
-    before = (await defiPlaza.DFP_config()).unlocked;
+    before = (await defiPlaza.DFPconfig()).unlocked;
 
     defiPlaza.lockExchange({ from: admin });
 
-    after = (await defiPlaza.DFP_config()).unlocked;
+    after = (await defiPlaza.DFPconfig()).unlocked;
     expect(before).to.be.true;
     expect(after).to.be.false;
   });
 
   it('admin can unlock exchange', async () => {
-    before = (await defiPlaza.DFP_config()).unlocked;
+    before = (await defiPlaza.DFPconfig()).unlocked;
 
     defiPlaza.unlockExchange({ from: admin });
 
-    after = (await defiPlaza.DFP_config()).unlocked;
+    after = (await defiPlaza.DFPconfig()).unlocked;
     expect(before).to.be.false;
     expect(after).to.be.true;
   });
@@ -114,14 +114,14 @@ contract('Admin features of exchange contract', accounts => {
   });
 
   it('owner can change trading fee', async () => {
-    before = (await defiPlaza.DFP_config()).oneMinusTradingFee;
+    before = (await defiPlaza.DFPconfig()).oneMinusTradingFee;
 
     await defiPlaza.setTradingFee(
       18409850585562132480n,
       { from: owner }
     );
 
-    after = (await defiPlaza.DFP_config()).oneMinusTradingFee;
+    after = (await defiPlaza.DFPconfig()).oneMinusTradingFee;
     expect(before).to.be.bignumber.equal('18428297329635842048'); // 0.1% fee
     expect(after).to.be.bignumber.equal('18409850585562132480'); // 0.2% fee
   });
@@ -172,14 +172,14 @@ contract('Admin features of exchange contract', accounts => {
   });
 
   it('owner can change delisting bonus when change pending', async () => {
-    before = (await defiPlaza.DFP_config()).delistingBonus;
+    before = (await defiPlaza.DFPconfig()).delistingBonus;
 
     await defiPlaza.setDeListingBonus(
       922337203685477632n,
       { from: owner }
     );
 
-    after = (await defiPlaza.DFP_config()).delistingBonus;
+    after = (await defiPlaza.DFPconfig()).delistingBonus;
     expect(before).to.be.bignumber.equal('0');
     expect(after).to.be.bignumber.equal('922337203685477632');
   });
