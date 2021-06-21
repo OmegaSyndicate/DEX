@@ -178,6 +178,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
     multisigAllocationClaimed = R1;
 
     _mint(multisig, amountReleased);
+    emit MultisigClaim(multisig, amountReleased);
   }
 
   function claimFounderAllocation(uint256 amount, address destination)
