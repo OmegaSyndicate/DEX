@@ -42,7 +42,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   mapping(address => TokenSettings) public listedTokens;
   Config public DFP_config;
   ListingUpdate public listingUpdate;
-  address admin;
+  address public admin;
 
   /**
   * Sets up default configuration
@@ -244,7 +244,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
         "DFP: Token not listed"
       );
       dexBalance = IERC20(token).balanceOf(address(this));
-      currentRatio = maxAmounts[i].mul(1<<128) / dexBalance;
+      currentRatio = maxAmounts[i].mul(1 << 128) / dexBalance;
       if (currentRatio < actualRatio) {
         actualRatio = currentRatio;
       }

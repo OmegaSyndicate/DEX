@@ -61,7 +61,8 @@ contract('Admin features of governance contract', accounts => {
     await time.increaseTo(BigInt(startState.startTime.toString()) + 15768000n); // jump to half a year after program start
     await dfpGov.claimMultisigAllocation();
     balance = await dfpGov.balanceOf(multisig);
-    expect(balance).to.be.bignumber.equal('3750000000000000000000000'); // three quarters of final
+    expect(balance).to.be.bignumber.at.least('3750000000000000000000000'); // three quarters of final
+    expect(balance).to.be.bignumber.at.most('3750000158548954891268395'); // a bit of slack for execution time variance
   });
 
   it('multisig asking again doesnt give more', async () => {
@@ -124,4 +125,3 @@ contract('Admin features of governance contract', accounts => {
     expect(balance).to.be.bignumber.equal('5000000000000000000000000'); // all
   });
 });
-DeFiPlaza

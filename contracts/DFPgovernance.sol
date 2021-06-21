@@ -35,11 +35,11 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
   uint256 multisigAllocationClaimed;
   uint256 founderAllocationClaimed;
 
-  constructor(address founderAddress) ERC20("DeFi Plaza governance token", "DFP") {
+  constructor(address founderAddress, uint32 startTime) ERC20("DeFi Plaza governance token", "DFP") {
     founder = founderAddress;
 
     StakingState memory state;
-    state.startTime = 1624356000;  // 22nd of June 2021 12:00 GMT+2
+    state.startTime = startTime;
     stakingState = state;
 
     _mint(founderAddress, 4e24);
