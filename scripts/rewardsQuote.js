@@ -19,7 +19,6 @@ const FINNEY = 1000000000000000n
      dfpGov = await DFPgov.deployed();
      wallets = await web3.eth.getAccounts();
 
-     await time.advanceBlock();
      quote = await dfpGov.rewardsQuote(wallets[0]);
      console.log("Quote: ", quote.toString());
      console.log("Completed");

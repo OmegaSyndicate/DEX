@@ -24,4 +24,14 @@ interface IDeFiPlazaGov {
     uint256 LPamount,
     uint256 rewards
   );
+
+  event MultisigClaim(
+    address multisig,
+    uint256 amount
+  );
+
+  event FounderClaim(
+    address claimant,
+    uint256 amount
+  );
 }

@@ -98,7 +98,7 @@ contract('Admin features of governance contract', accounts => {
 
   it('founder can claim up to 5M tokens', async () => {
     await dfpGov.claimFounderAllocation(
-      4000000n * ONE,
+      9000000n * ONE,
       other3,
       { from : founder}
     );
@@ -107,16 +107,14 @@ contract('Admin features of governance contract', accounts => {
   });
 
   it('founder cannot claim more than 5M tokens', async () => {
-    await expectRevert(
-      dfpGov.claimFounderAllocation(
-        1n,
-        founder,
-        { from : founder}
-      ),
-      "Too much man"
+    await dfpGov.claimFounderAllocation(
+      1n,
+      other3,
+      { from : founder}
     );
-    balance = await dfpGov.balanceOf(founder);
-    expect(balance).to.be.bignumber.equal('4000000000000000000000000'); // these were issued at construction
+
+    balance = await dfpGov.balanceOf(other3);
+    expect(balance).to.be.bignumber.equal('4000000000000000000000000');
   });
 
   it('multisig final amount is correct', async () => {

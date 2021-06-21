@@ -176,22 +176,24 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     amountReleased = R1 - multisigAllocationClaimed;
     multisigAllocationClaimed = R1;
+
     _mint(multisig, amountReleased);
   }
 
   function claimFounderAllocation(uint256 amount, address destination)
     external
-    returns(bool success)
+    returns(uint256 actualAmount)
   {
     require(msg.sender == founder, "Not yours man");
     StakingState memory state = stakingState;
     require(block.timestamp - state.startTime >= 31536000, "Too early man");
 
     uint256 availableAmount = 5e24 - founderAllocationClaimed;
-    require(founderAllocationClaimed <= availableAmount, "Too much man");
-    founderAllocationClaimed += amount;
-    _mint(destination, amount);
-    return true;
+    actualAmount = (amount > availableAmount) ? availableAmount : amount;
+    founderAllocationClaimed += actualAmount;
+
+    _mint(destination, actualAmount);
+    emit FounderClaim(destination, actualAmount);
   }
 
 }
