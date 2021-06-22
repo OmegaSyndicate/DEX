@@ -16,18 +16,21 @@ const TokenY = artifacts.require("TokenY");
 const TokenZ = artifacts.require("TokenZ");
 const DeFiPlaza = artifacts.require("DeFiPlaza");
 const DFPgov = artifacts.require("DFPgov");
+const Timelock = artifacts.require("Timelock");
 
 module.exports = function(deployer, network, accounts) {
   deployer.then(async () => {
     const networkID = await web3.eth.net.getId();
+    const founder = "0x2f7ab204f3675353F37c70f180944a65b9890a9a";
     switch (networkID) {
 
       case 1:   // Network ID 1 is for main net (and forks thereof). The real deal is deployed here.
         const addresses = require("../tokens.json");
-        await deployer.deploy(DFPgov, "0x2f7ab204f3675353F37c70f180944a65b9890a9a", 1624356000);  // 22nd of June 2021 12:00 GMT+2
+        await deployer.deploy(DFPgov, founder, 1624356000);  // 22nd of June 2021 12:00 GMT+2
         tokens = Object.values(addresses);
         tokens.push(DFPgov.address.toLowerCase());
         await deployer.deploy(DeFiPlaza, tokens.sort(), "DeFi Plaza Main Index", "XDP1");
+        await deployer.deploy(Timelock, [founder]);
         break;
 
       default:  // All other networks are test networks requiring test token config
@@ -54,6 +57,7 @@ module.exports = function(deployer, network, accounts) {
           TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
           TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
         await deployer.deploy(DeFiPlaza, tokens.sort(), "DeFi Plaza Main Index", "XDP1");
+        await deployer.deploy(Timelock, [accounts[5]]);
     }
   });
 };
