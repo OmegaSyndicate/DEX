@@ -75,7 +75,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
       uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
       uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
-      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
+      state.rewardsAccumulatedPerLP += uint96(((R1.sub(R0)) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
     }
     state.totalStake += LPamount;
@@ -124,7 +124,8 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
       t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
       uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
       uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
-      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / state.totalStake);
+      uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
+      state.rewardsAccumulatedPerLP += uint96(((R1.sub(R0)) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
     }
     state.totalStake -= LPamount;
@@ -167,7 +168,8 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
       t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
       uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
       uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
-      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / state.totalStake);
+      uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
+      state.rewardsAccumulatedPerLP += uint96(((R1.sub(R0)) << 80) / totalStake);
     }
 
     // Calculate unclaimed rewards
