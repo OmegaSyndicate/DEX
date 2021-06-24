@@ -27,7 +27,9 @@ require('dotenv').config();
 //const LedgerWalletProvider = require('@umaprotocol/truffle-ledger-provider');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const mnemonicPhrase = process.env.MNEMONIC;
+const mainMnemonic = process.env.MAIN_MNEMONIC;
 const mainForkURL = process.env.TRUFFLE_TEAMS_URL;
+const mainnetURL = process.env.MAINNET_URL;
 const ropstenURL = process.env.ROPSTEN_URL;
 const etherbaseKey = process.env.ETHERBASE_KEY;
 /*
@@ -48,6 +50,13 @@ ropstenConfig = {
   mnemonic : mnemonicPhrase,
   providerOrUrl : ropstenURL,
   numberOfAddresses: 10,
+  addressIndex: 0
+}
+mainConfig = {
+  mnemonic : mainMnemonic,
+  providerOrUrl : mainnetURL,
+  gasPrice: 10000000000,
+  numberOfAddresses: 1,
   addressIndex: 0
 }
 
@@ -77,6 +86,12 @@ module.exports = {
 
    mainfork: {
      provider: () => new HDWalletProvider(mainForkConfig),
+     port: 7545,            // Standard Ethereum port (default: none)
+     network_id: 1,
+   },
+
+   mainnet: {
+     provider: () => new HDWalletProvider(mainConfig),
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
    },
