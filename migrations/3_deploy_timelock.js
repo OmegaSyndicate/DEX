@@ -14,6 +14,7 @@ module.exports = function(deployer, network, accounts) {
 
       case 1337:   // Network ID 1337 is for Ganache
         await deployer.deploy(TimeCheck);
+        await deployer.deploy(Timelock, [accounts[5]]);
         break;
 
     }

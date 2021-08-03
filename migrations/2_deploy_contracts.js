@@ -16,7 +16,6 @@ const TokenY = artifacts.require("TokenY");
 const TokenZ = artifacts.require("TokenZ");
 const DeFiPlaza = artifacts.require("DeFiPlaza");
 const DFPgov = artifacts.require("DFPgov");
-const Timelock = artifacts.require("Timelock");
 
 module.exports = function(deployer, network, accounts) {
   deployer.then(async () => {
@@ -26,11 +25,10 @@ module.exports = function(deployer, network, accounts) {
 
       case 1:   // Network ID 1 is for main net (and forks thereof). The real deal is deployed here.
         const addresses = require("../tokens.json");
-        await deployer.deploy(DFPgov, founder, 1624723200);  // 26th of June 2021 16:00 UTC
+        await deployer.deploy(DFPgov, founder, 1630447200);  // Sept 1st 2021 00:00 CET
         tokens = Object.values(addresses);
         tokens.push(DFPgov.address.toLowerCase());
         await deployer.deploy(DeFiPlaza, tokens.sort(), "DeFi Plaza Main Index", "XDP1");
-        await deployer.deploy(Timelock, [founder]);
         break;
 
       default:  // All other networks are test networks requiring test token config
@@ -50,14 +48,13 @@ module.exports = function(deployer, network, accounts) {
         await deployer.deploy(TokenN);
         await deployer.deploy(TokenY);
         await deployer.deploy(TokenZ);
-        await deployer.deploy(DFPgov, accounts[5], 1624723200);
+        await deployer.deploy(DFPgov, accounts[5], 1630447200);
         tokens = [TokenA.address.toLowerCase(), TokenB.address.toLowerCase(), TokenC.address.toLowerCase(),
           TokenD.address.toLowerCase(), TokenE.address.toLowerCase(), TokenF.address.toLowerCase(),
           TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
           TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
           TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
         await deployer.deploy(DeFiPlaza, tokens.sort(), "DeFi Plaza Main Index", "XDP1");
-        await deployer.deploy(Timelock, [accounts[5]]);
     }
   });
 };

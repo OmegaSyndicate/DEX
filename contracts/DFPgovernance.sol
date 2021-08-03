@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.6;
+pragma solidity ^0.8.6;
 
 import "../interfaces/IDeFiPlazaGov.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -13,7 +12,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @notice Implements lean on gas liquidity reward program for DeFi Plaza
  */
 contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
-  using SafeMath for uint256;
 
   // global staking contract state parameters squeezed in 256 bits
   struct StakingState {
@@ -75,7 +73,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
       uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
       uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
-      state.rewardsAccumulatedPerLP += uint96(((R1.sub(R0)) << 80) / totalStake);
+      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
     }
     state.totalStake += LPamount;
@@ -125,7 +123,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
       uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
       uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
-      state.rewardsAccumulatedPerLP += uint96(((R1.sub(R0)) << 80) / totalStake);
+      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
     }
     state.totalStake -= LPamount;
@@ -169,7 +167,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
       uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
       uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
-      state.rewardsAccumulatedPerLP += uint96(((R1.sub(R0)) << 80) / totalStake);
+      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
     }
 
     // Calculate unclaimed rewards

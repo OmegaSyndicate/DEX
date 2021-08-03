@@ -70,6 +70,24 @@ contract('LiquidityAdd', accounts => {
       .to.be.bignumber.equal('9607320622173065924');
   });
 
+  it('rejects zero liquidity add', async () => {
+    await expectRevert(
+      defiPlaza.addLiquidity(
+        tokenA.address,
+        0n,
+        0n,
+        { from : trader_A }
+      ),
+      "DFP: No deal"
+    );
+    expect(await tokenA.balanceOf(trader_A))
+      .to.be.bignumber.equal('9000000000000000000000');
+    expect(await tokenA.balanceOf(dex))
+      .to.be.bignumber.equal('11000000000000000000000');
+    expect(await defiPlaza.balanceOf(trader_A))
+      .to.be.bignumber.equal('9607320622173065924');
+  });
+
   it('rejects very large single side liquidity addition', async () => {
     await expectRevert(
       defiPlaza.addLiquidity(
@@ -163,6 +181,23 @@ contract('LiquidityRemove', accounts => {
       tokenA.address,
       960187926081688418377n,
       { from : trader_A }
+    );
+    expect(await defiPlaza.balanceOf(trader_A))
+      .to.be.bignumber.equal('90000000000000000000');
+    expect(await tokenA.balanceOf(trader_A))
+      .to.be.bignumber.equal('1960187926107208037881');
+    expect(await tokenA.balanceOf(dex))
+      .to.be.bignumber.equal('9039812073892791962119');
+  });
+
+  it('rejects zero remove', async () => {
+    await expectRevert.unspecified(
+      defiPlaza.removeLiquidity(
+        0n,
+        tokenA.address,
+        0n,
+        { from : trader_A }
+      )
     );
     expect(await defiPlaza.balanceOf(trader_A))
       .to.be.bignumber.equal('90000000000000000000');

@@ -144,6 +144,39 @@ contract('AddMultipleTokens', accounts => {
     expect(balance).to.be.bignumber.equal('2399199999999999999289');
   });
 
+  it('gracefully adds zero liquidity', async () => {
+    await defiPlaza.addMultiple(
+      tokens,
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      { value : 0 }
+    );
+
+    // Check one of each group
+    balance = await web3.eth.getBalance(dex);
+    expect(balance).to.be.bignumber.equal('15000000000000000000');
+    balance = await tokenA.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('15000000000000000000000');
+    balance = await tokenI.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('7500000000000000000000');
+    balance = await tokenM.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('30000000000000000000000');
+    balance = await dfpGov.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('1500000000000000000000000');
+
+    // Check one of each group
+    balance = await tokenA.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('985000000000000000000000');
+    balance = await tokenI.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('992500000000000000000000');
+    balance = await tokenM.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('970000000000000000000000');
+    balance = await dfpGov.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('3500000000000000000000000');
+
+    balance = await defiPlaza.balanceOf(owner);
+    expect(balance).to.be.bignumber.equal('2399199999999999999289');
+  });
+
   it('rejects liquidity when locked', async () => {
     await defiPlaza.lockExchange();
     await expectRevert(
@@ -212,6 +245,39 @@ contract('RemoveMultipleTokens', accounts => {
 
     await defiPlaza.removeMultiple(
       400n * ONE,
+      tokens,
+      { from: trader_1 }
+    );
+
+    // Check one of each group
+    balance = await web3.eth.getBalance(dex);
+    expect(balance).to.be.bignumber.equal('7500000000000000000');
+    balance = await tokenA.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('7500000000000000000000');
+    balance = await tokenI.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('3750000000000000000000');
+    balance = await tokenM.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('15000000000000000000000');
+    balance = await dfpGov.balanceOf(dex);
+    expect(balance).to.be.bignumber.equal('750000000000000000000000');
+
+    // Check one of each group
+    balance = await tokenA.balanceOf(trader_1);
+    expect(balance).to.be.bignumber.equal('2500000000000000000000');
+    balance = await tokenI.balanceOf(trader_1);
+    expect(balance).to.be.bignumber.equal('1250000000000000000000');
+    balance = await tokenM.balanceOf(trader_1);
+    expect(balance).to.be.bignumber.equal('5000000000000000000000');
+    balance = await dfpGov.balanceOf(trader_1);
+    expect(balance).to.be.bignumber.equal('250000000000000000000000');
+
+    balance = await defiPlaza.balanceOf(trader_1);
+    expect(balance).to.be.bignumber.equal('0');
+  });
+
+  it('gracefully withdraws zero liquidity', async () => {
+    await defiPlaza.removeMultiple(
+      0n,
       tokens,
       { from: trader_1 }
     );

@@ -55,7 +55,6 @@ ropstenConfig = {
 mainConfig = {
   mnemonic : mainMnemonic,
   providerOrUrl : mainnetURL,
-  gasPrice: 10000000000,
   numberOfAddresses: 1,
   addressIndex: 0
 }
@@ -94,6 +93,7 @@ module.exports = {
      provider: () => new HDWalletProvider(mainConfig),
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
+     gasPrice: 50000000000
    },
 
    ropsten: {
@@ -138,7 +138,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-        version: "0.7.6",    // Fetch exact version from solc-bin (default: truffle's version)
+        version: "0.8.6",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
        settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {

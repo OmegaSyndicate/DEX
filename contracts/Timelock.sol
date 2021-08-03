@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.6;
-pragma abicoder v2;
+pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/access/TimelockController.sol";
+import "@openzeppelin/contracts/governance/TimelockController.sol";
 
 /**
  * @title Timelock for critical maintenance activities
