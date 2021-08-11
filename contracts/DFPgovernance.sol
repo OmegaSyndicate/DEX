@@ -38,7 +38,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
   /**
   * Basic setup
   */
-  constructor(address founderAddress, uint32 startTime) ERC20("DeFi Plaza governance token", "DFP") {
+  constructor(address founderAddress, uint256 mintAmount, uint32 startTime) ERC20("DeFi Plaza governance token", "DFP") {
     // contains the global state of the staking progress
     StakingState memory state;
     state.startTime = startTime;
@@ -46,7 +46,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     // generate the initial 4M founder allocation
     founder = founderAddress;
-    _mint(founderAddress, 4e24);
+    _mint(founderAddress, mintAmount);
   }
 
   /**
@@ -247,5 +247,31 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
     // Grant rewards and emit event for logging
     _mint(destination, actualAmount);
     emit FounderClaim(destination, actualAmount);
+  }
+
+  /**
+  * Freeze program (makes it easier to migrate if required)
+  * This is a one-way thing, only to be used in case of migration.
+  */
+  function stopProgram()
+    external
+    onlyOwner()
+  {
+    // Update the global staking state
+    StakingState memory state = stakingState;
+    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
+      uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
+      uint256 t0 = uint256(state.lastUpdate);
+      t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
+      uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
+      uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+      uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
+      state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
+      state.lastUpdate = uint32(t1);
+    }
+
+    // Freeze by setting the startTime when we're all going to be dead
+    state.startTime = 0xffff;
+    stakingState = state;
   }
 }

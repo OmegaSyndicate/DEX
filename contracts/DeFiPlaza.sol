@@ -49,7 +49,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   * Initialize with ordered list of 15 token addresses (ETH is always listed)
   * Doesn't do any checks. Make sure you ONLY add well behaved ERC20s!!
   */
-  constructor(address[] memory tokensToList, string memory name_, string memory symbol_) ERC20(name_, symbol_) {
+  constructor(address[] memory tokensToList, uint256 mintAmount, string memory name_, string memory symbol_) ERC20(name_, symbol_) {
     // Basic exchange configuration
     Config memory config;
     config.unlocked = false;
@@ -71,7 +71,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     }
 
     // Generate the LP tokens reflecting the initial liquidity (to be loaded externally)
-    _mint(msg.sender, 1600e18);
+    _mint(msg.sender, mintAmount);
   }
 
   // For bootstrapping ETH liquidity
