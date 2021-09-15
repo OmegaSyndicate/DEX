@@ -153,7 +153,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   }
 
   /**
-  * Single sided liquidity add. More economic at moderate liquidity amounts.
+  * Single sided liquidity add. More economic at low/moderate liquidity amounts.
   * Mathematically works as adding all tokens and swapping back to 1 token at no fee.
   *
   *         R = (1 + X_supplied/X_initial)^(1/N) - 1
@@ -161,6 +161,15 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
   *
   * When adding ETH, the inputToken address to be used is the NULL address.
   * A fee is applied to prevent zero fee swapping through liquidity add/remove.
+  *
+  * Note that this method suffers from two forms of slippage.
+  *   1. Slippage from single sided add which is modeled with 15 internal swaps
+  *   2. Slippage from the numerical approximation required for calculation.
+  *
+  * When adding a large amount of liquidity when compared with the existing
+  * liquidity for the selected token, the slippage can become quite significant.
+  * The smart contract limits the maximum input amount at 100% of the existing
+  * liquidity, at which point the slippage is 29.2% (due to 1) + 9.3% (due to 2)
   */
   function addLiquidity(address inputToken, uint256 inputAmount, uint256 minLP)
     external
@@ -186,7 +195,16 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // Prevent excessive liquidity add which runs of the approximation curve
     require(inputAmount < initialBalance, "DFP: Too much at once");
 
-    // 6th power binomial series approximation of R
+    // See https://en.wikipedia.org/wiki/Binomial_approximation for the below
+    // Compute the 6th power binomial series approximation of R.
+    //
+    //                   X   15 X^2   155 X^3   7285 X^4   91791 X^5   2417163 X^6
+    // (1+X)^1/16 - 1 ≈ -- - ------ + ------- - -------- + --------- - -----------
+    //                  16    512      8192      524288     8388608     268435456
+    //
+    // Note that we need to terminate at an even order to guarantee an underestimate
+    // for safety. The underestimation leads to slippage for higher amounts, but
+    // protects funds of those that are already invested.
     uint256 X = (inputAmount * _config.oneMinusTradingFee) / initialBalance;  // 0.64 bits
     uint256 X_ = X * X;                                // X^2   0.128 bits
     uint256 R_ = (X >> 4) - (X_ * 15 >> 73);           // R2    0.64 bits

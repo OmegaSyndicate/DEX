@@ -228,3 +228,50 @@ contract('Staking for governance tokens', accounts => {
     expect(totalGov).to.be.bignumber.at.most('90000000000000000000000000'); // some leeway for ±1s execution time differences
   }); // //total stake now 0
 });
+
+contract('Emergency reward program termination', accounts => {
+  const [owner, staker_1, staker_2, staker_3] = accounts;
+
+  before(async () => {
+    tokenA = await TokenA.deployed();
+    tokenB = await TokenB.deployed();
+    tokenC = await TokenC.deployed();
+    defiPlaza = await DeFiPlaza.deployed();
+    dfpGov = await DFPgov.deployed();
+    startState = await dfpGov.stakingState();
+
+    await defiPlaza.unlockExchange();
+    await dfpGov.setIndexToken(defiPlaza.address);
+  });
+
+  it('correctly initializes to 1600 stake', async () => {
+    await defiPlaza.transfer(staker_1, 1600n * ONE);
+    await defiPlaza.approve(dfpGov.address, constants.MAX_UINT256, { from: staker_1 });
+    await dfpGov.stake(1600n * ONE, {from: staker_1});    // Need a minimum of 1600 staked at all times
+
+    balance = await defiPlaza.balanceOf(dfpGov.address);
+
+    expect(balance).to.be.bignumber.equal('1600000000000000000000');
+    state = await dfpGov.stakingState();
+    expect(state.totalStake).to.be.bignumber.equal('1600000000000000000000');
+  }); //total stake now 1600
+
+  it('correctly runs first half year before stopped', async () => {
+    await time.increaseTo(BigInt(startState.startTime.toString()) + 15768000n); // jump to half a year after program start
+    await dfpGov.stopProgram();
+    await dfpGov.unstake(0n, { from: staker_1 });
+
+    balance = await dfpGov.balanceOf(staker_1);
+
+    expect(balance).to.be.bignumber.equal('63750000000000000000000000'); // 3/4th of rewards distributed
+  });
+
+  it('no more reward distribution when program halted', async () => {
+    await time.increaseTo(BigInt(startState.startTime.toString()) + 157680000n); // jump to 5 years after program start
+    await dfpGov.unstake(0n, { from: staker_1 });
+
+    quote = await dfpGov.rewardsQuote(owner);
+
+    expect(balance).to.be.bignumber.equal('63750000000000000000000000'); // No new rewards distributed
+  });
+});
