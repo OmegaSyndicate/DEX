@@ -115,7 +115,7 @@ contract('AddMultipleTokens', accounts => {
     await defiPlaza.addMultiple(
       tokens,
       maxAmounts,
-      { value :  Number(maxAmounts[0]) }
+      { value : Number(maxAmounts[0]) }
     );
 
     // Check one of each group
@@ -150,43 +150,41 @@ contract('AddMultipleTokens', accounts => {
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       { value : 0 }
     );
-
-    // Check one of each group
-    balance = await web3.eth.getBalance(dex);
-    expect(balance).to.be.bignumber.equal('15000000000000000000');
-    balance = await tokenA.balanceOf(dex);
-    expect(balance).to.be.bignumber.equal('15000000000000000000000');
-    balance = await tokenI.balanceOf(dex);
-    expect(balance).to.be.bignumber.equal('7500000000000000000000');
-    balance = await tokenM.balanceOf(dex);
-    expect(balance).to.be.bignumber.equal('30000000000000000000000');
-    balance = await dfpGov.balanceOf(dex);
-    expect(balance).to.be.bignumber.equal('1500000000000000000000000');
-
-    // Check one of each group
-    balance = await tokenA.balanceOf(owner);
-    expect(balance).to.be.bignumber.equal('985000000000000000000000');
-    balance = await tokenI.balanceOf(owner);
-    expect(balance).to.be.bignumber.equal('992500000000000000000000');
-    balance = await tokenM.balanceOf(owner);
-    expect(balance).to.be.bignumber.equal('970000000000000000000000');
-    balance = await dfpGov.balanceOf(owner);
-    expect(balance).to.be.bignumber.equal('3500000000000000000000000');
-
-    balance = await defiPlaza.balanceOf(owner);
-    expect(balance).to.be.bignumber.equal('2399199999999999999289');
   });
 
   it('rejects liquidity when locked', async () => {
     await defiPlaza.lockExchange();
     await expectRevert(
-      defiPlaza.addLiquidity(
-        tokenA.address,
-        1000n*ONE,
-        0n,
-        { from : trader_2 }
+      defiPlaza.addMultiple(
+        tokens,
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        { value : 0 }
       ),
       "DFP: Locked"
+    );
+  });
+
+  it('rejects list not starting with null address (ETH)', async () => {
+    await defiPlaza.unlockExchange();
+    await expectRevert(
+      defiPlaza.addMultiple(
+        tokens.reverse(),
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        { value : 0 }
+      ),
+      "DFP: No ETH found"
+    );
+  });
+
+  it('rejects list in incorrect order', async () => {
+    tokens[0] = constants.ZERO_ADDRESS;
+    await expectRevert(
+      defiPlaza.addMultiple(
+        tokens.reverse(),
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        { value : 0 }
+      ),
+      "DFP: Require ordered list"
     );
   });
 });
