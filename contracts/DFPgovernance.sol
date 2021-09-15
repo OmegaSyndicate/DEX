@@ -66,12 +66,12 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     // Update global staking state
     StakingState memory state = stakingState;
-    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
+    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 365 days)) {
       uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
       uint256 t0 = uint256(state.lastUpdate);
-      t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
-      uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
-      uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+      t1 = (t1 > 365 days) ? 365 days : t1;                 // clamp at 1 year
+      uint256 R1 = 170e24 * t1 / 365 days - 85e24 * t1 * t1 / (365 days)**2;
+      uint256 R0 = 170e24 * t0 / 365 days - 85e24 * t0 * t0 / (365 days)**2;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
       state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
@@ -116,12 +116,12 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     // Update the global staking state
     StakingState memory state = stakingState;
-    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
+    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 365 days)) {
       uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
       uint256 t0 = uint256(state.lastUpdate);
-      t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
-      uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
-      uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+      t1 = (t1 > 365 days) ? 365 days : t1;                 // clamp at 1 year
+      uint256 R1 = 170e24 * t1 / 365 days - 85e24 * t1 * t1 / (365 days)**2;
+      uint256 R0 = 170e24 * t0 / 365 days - 85e24 * t0 * t0 / (365 days)**2;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
       state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
@@ -142,7 +142,10 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     // Distribute reward and emit event
     _mint(msg.sender, rewards);
-    IERC20(indexToken).transfer(msg.sender, LPamount);
+    require(
+      IERC20(indexToken).transfer(msg.sender, LPamount),
+      "DFP: Kernel panic"
+    );
     emit Unstaked(msg.sender, LPamount, rewards);
   }
 
@@ -160,12 +163,12 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     // Calculate distribution since last on chain update
     StakingState memory state = stakingState;
-    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
+    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 365 days)) {
       uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
       uint256 t0 = uint256(state.lastUpdate);
-      t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
-      uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
-      uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+      t1 = (t1 > 365 days) ? 365 days : t1;                 // clamp at 1 year
+      uint256 R1 = 170e24 * t1 / 365 days - 85e24 * t1 * t1 / (365 days)**2;
+      uint256 R0 = 170e24 * t0 / 365 days - 85e24 * t0 * t0 / (365 days)**2;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
       state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
     }
@@ -215,8 +218,8 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
 
     // Calculate total community allocation until now
     uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
-    t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
-    uint256 R1 = 10e24 * t1 / 31536000 - 5e24 * t1 * t1 / 994519296000000;
+    t1 = (t1 > 365 days) ? 365 days : t1;                 // clamp at 1 year
+    uint256 R1 = 10e24 * t1 / 365 days - 5e24 * t1 * t1 / (365 days)**2;
 
     // Calculate how much is to be released now & update released counter
     amountReleased = R1 - multisigAllocationClaimed;
@@ -237,7 +240,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
     // Basic validity checks
     require(msg.sender == founder, "Not yours man");
     StakingState memory state = stakingState;
-    require(block.timestamp - state.startTime >= 31536000, "Too early man");
+    require(block.timestamp - state.startTime >= 365 days, "Too early man");
 
     // Calculate how many rewards are still available & update claimed counter
     uint256 availableAmount = 5e24 - founderAllocationClaimed;
@@ -259,19 +262,19 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
   {
     // Update the global staking state
     StakingState memory state = stakingState;
-    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 31536000)) {
+    if ((block.timestamp >= state.startTime) && (state.lastUpdate < 365 days)) {
       uint256 t1 = block.timestamp - state.startTime;       // calculate time relative to start time
       uint256 t0 = uint256(state.lastUpdate);
-      t1 = (t1 > 31536000) ? 31536000 : t1;                 // clamp at 1 year
-      uint256 R1 = 170e24 * t1 / 31536000 - 85e24 * t1 * t1 / 994519296000000;
-      uint256 R0 = 170e24 * t0 / 31536000 - 85e24 * t0 * t0 / 994519296000000;
+      t1 = (t1 > 365 days) ? 365 days : t1;                 // clamp at 1 year
+      uint256 R1 = 170e24 * t1 / 365 days - 85e24 * t1 * t1 / (365 days)**2;
+      uint256 R0 = 170e24 * t0 / 365 days - 85e24 * t0 * t0 / (365 days)**2;
       uint256 totalStake = (state.totalStake < 1600e18) ? 1600e18 : state.totalStake;  // Clamp at 1600 for numerical reasons
       state.rewardsAccumulatedPerLP += uint96(((R1 - R0) << 80) / totalStake);
       state.lastUpdate = uint32(t1);
     }
 
     // Freeze by setting the startTime when we're all going to be dead
-    state.startTime = 0xffff;
+    state.startTime = type(uint32).max;
     stakingState = state;
   }
 }

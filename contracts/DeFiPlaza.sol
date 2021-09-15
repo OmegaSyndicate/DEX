@@ -384,6 +384,8 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     // Calculate how many tokens to actually take in (clamp at max available)
     uint256 initialInputBalance = IERC20(inputToken).balanceOf(address(this));
     uint256 availableAmount;
+
+    // Intentionally underflow (zero clamping) is the cheapest way to gracefully prevent failing when target is already met
     unchecked { availableAmount = tokenToList.listingTarget - initialInputBalance; }
     if (initialInputBalance >= tokenToList.listingTarget) { availableAmount = 1; }
     uint256 actualInputAmount = maxInputAmount > availableAmount ? availableAmount : maxInputAmount;
@@ -462,7 +464,7 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
       address payable sender = payable(msg.sender);
       sender.transfer(bonusAmount);
     } else {
-      IERC20(bonusToken).transfer(msg.sender, bonusAmount);
+      IERC20(bonusToken).safeTransfer(msg.sender, bonusAmount);
     }
 
     // Emit event to enable data driven governance
