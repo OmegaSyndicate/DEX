@@ -273,12 +273,10 @@ contract DeFiPlaza is IDeFiPlaza, Ownable, ERC20 {
     actualLP = (actualRatio * totalSupply() >> 64) * DFPconfig.oneMinusTradingFee >> 128;
 
     // Collect ERC20 tokens
-    previous = address(0);
     for (uint256 i = 1; i < 16; i++) {
       token = tokens[i];
       dexBalance = IERC20(token).balanceOf(address(this));
       IERC20(token).safeTransferFrom(msg.sender, address(this), dexBalance * actualRatio >> 128);
-      previous = token;
     }
 
     // Mint the LP tokens
