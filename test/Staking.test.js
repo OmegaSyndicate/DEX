@@ -263,15 +263,17 @@ contract('Emergency reward program termination', accounts => {
 
     balance = await dfpGov.balanceOf(staker_1);
 
-    expect(balance).to.be.bignumber.equal('63750000000000000000000000'); // 3/4th of rewards distributed
+    expect(balance).to.be.bignumber.at.least('63750000000000000000000000'); // 3/4th of rewards distributed
+    expect(balance).to.be.bignumber.at.most('63750010000000000000000000');
   });
 
   it('no more reward distribution when program halted', async () => {
     await time.increaseTo(BigInt(startState.startTime.toString()) + 157680000n); // jump to 5 years after program start
     await dfpGov.unstake(0n, { from: staker_1 });
 
-    quote = await dfpGov.rewardsQuote(owner);
+    balance = await dfpGov.balanceOf(staker_1);
 
-    expect(balance).to.be.bignumber.equal('63750000000000000000000000'); // No new rewards distributed
+    expect(balance).to.be.bignumber.at.least('63750000000000000000000000'); // 3/4th of rewards distributed
+    expect(balance).to.be.bignumber.at.most('63750010000000000000000000');
   });
 });
