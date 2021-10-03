@@ -27,10 +27,10 @@ module.exports = function(deployer, network, accounts) {
 
       case 1:   // Network ID 1 is for main net (and forks thereof). The real deal is deployed here.
         const addresses = require("../tokens.json");
-        await deployer.deploy(DFPgov, founder, 4000000n*ONE, 1633514400);  // Oct 6th 2021 12:00 CET
+        await deployer.deploy(DFPgov, founder, 9341915n*ONE, 1633514400);  // Oct 6th 2021 12:00 CET
         tokens = Object.values(addresses);
         tokens.push(DFPgov.address.toLowerCase());
-        await deployer.deploy(DeFiPlaza, tokens.sort(), 1600n*ONE, "Defi Plaza Index", "XDP2");
+        await deployer.deploy(DeFiPlaza, tokens.sort(), 11806n*ONE, "Defi Plaza Index", "XDP2");
         break;
 
       default:  // All other networks are test networks requiring test token config
