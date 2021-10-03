@@ -30,7 +30,7 @@ module.exports = function(deployer, network, accounts) {
         await deployer.deploy(DFPgov, founder, 4000000n*ONE, 1632909600);  // Sept 29th 2021 12:00 CET
         tokens = Object.values(addresses);
         tokens.push(DFPgov.address.toLowerCase());
-        await deployer.deploy(DeFiPlaza, tokens.sort(), 1600n*ONE, "DeFi Plaza Main Index", "XDP1");
+        await deployer.deploy(DeFiPlaza, tokens.sort(), 1600n*ONE, "DeFi Plaza Index", "XDP2");
         break;
 
       default:  // All other networks are test networks requiring test token config
@@ -56,7 +56,7 @@ module.exports = function(deployer, network, accounts) {
           TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
           TokenJ.address.toLowerCase(), TokenK.address.toLowerCase(), TokenL.address.toLowerCase(),
           TokenM.address.toLowerCase(), TokenN.address.toLowerCase(), DFPgov.address.toLowerCase()];
-        await deployer.deploy(DeFiPlaza, tokens.sort(), 1600n*ONE, "DeFi Plaza Main Index", "XDP1");
+        await deployer.deploy(DeFiPlaza, tokens.sort(), 1600n*ONE, "DeFi Plaza Index", "XDP2");
     }
   });
 };

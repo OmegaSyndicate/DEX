@@ -38,7 +38,7 @@ contract DFPgov is IDeFiPlazaGov, Ownable, ERC20 {
   /**
   * Basic setup
   */
-  constructor(address founderAddress, uint256 mintAmount, uint32 startTime) ERC20("DeFi Plaza governance token", "DFP") {
+  constructor(address founderAddress, uint256 mintAmount, uint32 startTime) ERC20("Defi Plaza governance", "DFP2") {
     // contains the global state of the staking progress
     StakingState memory state;
     state.startTime = startTime;
