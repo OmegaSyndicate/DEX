@@ -61,14 +61,14 @@ contract('Admin features of governance contract', accounts => {
     await time.increaseTo(BigInt(startState.startTime.toString()) + 15768000n); // jump to half a year after program start
     await dfpGov.claimMultisigAllocation();
     balance = await dfpGov.balanceOf(multisig);
-    expect(balance).to.be.bignumber.at.least('3750000000000000000000000'); // three quarters of final
-    expect(balance).to.be.bignumber.at.most('3750000158548954891268395'); // a bit of slack for execution time variance
+    expect(balance).to.be.bignumber.at.least('1875000000000000000000000'); // three quarters of final
+    expect(balance).to.be.bignumber.at.most('1875010000000000000000000'); // a bit of slack for execution time variance
   });
 
   it('multisig asking again doesnt give more', async () => {
     await dfpGov.claimMultisigAllocation();
     balance = await dfpGov.balanceOf(multisig);
-    expect(balance).to.be.bignumber.at.most('3750000158548954891268395'); // up to 1s execution time slack
+    expect(balance).to.be.bignumber.at.most('1875010000000000000000000'); // up to 1s execution time slack
   });
 
   it('non-founder cannot claim founder reward', async () => {
@@ -96,17 +96,17 @@ contract('Admin features of governance contract', accounts => {
     expect(balance).to.be.bignumber.equal('1000000000000000000000000');
   });
 
-  it('founder can claim up to 5M tokens', async () => {
+  it('founder can claim up to 2.5M tokens', async () => {
     await dfpGov.claimFounderAllocation(
       9000000n * ONE,
       other3,
       { from : founder}
     );
     balance = await dfpGov.balanceOf(other3);
-    expect(balance).to.be.bignumber.equal('4000000000000000000000000');
+    expect(balance).to.be.bignumber.equal('1500000000000000000000000');
   });
 
-  it('founder cannot claim more than 5M tokens', async () => {
+  it('founder cannot claim more than 2.5M tokens', async () => {
     await dfpGov.claimFounderAllocation(
       1n,
       other3,
@@ -114,12 +114,12 @@ contract('Admin features of governance contract', accounts => {
     );
 
     balance = await dfpGov.balanceOf(other3);
-    expect(balance).to.be.bignumber.equal('4000000000000000000000000');
+    expect(balance).to.be.bignumber.equal('1500000000000000000000000');
   });
 
   it('multisig final amount is correct', async () => {
     await dfpGov.claimMultisigAllocation();
     balance = await dfpGov.balanceOf(multisig);
-    expect(balance).to.be.bignumber.equal('5000000000000000000000000'); // all
+    expect(balance).to.be.bignumber.equal('2500000000000000000000000'); // all
   });
 });

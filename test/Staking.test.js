@@ -97,8 +97,8 @@ contract('Staking for governance tokens', accounts => {
 
     quote = await dfpGov.rewardsQuote(staker_1);
 
-    expect(quote).to.be.bignumber.at.least('185937500000000000000000'); // 7/16th of rewards distributed
-    expect(quote).to.be.bignumber.lt('185937530000000000000000'); // some leeway for ±1s execution time differences
+    expect(quote).to.be.bignumber.at.least('109375000000000000000000'); // 7/16th of rewards distributed
+    expect(quote).to.be.bignumber.lt('109375100000000000000000'); // some leeway for ±1s execution time differences
   });
 
   it('distributes rewards on zero unstake', async () => {
@@ -108,11 +108,11 @@ contract('Staking for governance tokens', accounts => {
     );
 
     rewards = await dfpGov.balanceOf(staker_1);
-    expect(rewards).to.be.bignumber.at.least('185937500000000000000000'); // 7/16th of rewards distributed
-    expect(rewards).to.be.bignumber.lt('185937530000000000000000'); // some leeway for ±1s execution time differences
+    expect(rewards).to.be.bignumber.at.least('109375000000000000000000'); // 7/16th of rewards distributed
+    expect(rewards).to.be.bignumber.lt('109375010000000000000000'); // some leeway for ±1s execution time differences
     staker = await dfpGov.stakerData(staker_1);
-    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.at.least('28098080573074389021491200000');
-    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.lt('28098084000000000000000000000');
+    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.at.least('16528282690043758247936000000');
+    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.lt('16528290000000000000000000000');
     expect(staker.stake).to.be.bignumber.equal('8000000000000000000');
     state = await dfpGov.stakingState();
     expect(state.rewardsAccumulatedPerLP).to.be.bignumber.equal(staker.rewardsPerLPAtTimeStaked);
@@ -130,8 +130,8 @@ contract('Staking for governance tokens', accounts => {
     );
 
     state = await dfpGov.stakingState();  // 39/64th of rewards now distributed
-    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.at.least('39136612226782184708505599999');
-    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.lt('39136615000000000000000000000'); // some leeway for ±1s exectuion time differences
+    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.at.least('23021536603989520416768000000');
+    expect(state.rewardsAccumulatedPerLP).to.be.bignumber.lt('23021536603990000000000000000'); // some leeway for ±1s exectuion time differences
     staker = await dfpGov.stakerData(staker_2);
     expect(staker.stake).to.be.bignumber.equal('4000000000000000000');
     expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.equal('0');
@@ -147,8 +147,8 @@ contract('Staking for governance tokens', accounts => {
 
     staker = await dfpGov.stakerData(staker_2);
     expect(staker.stake).to.be.bignumber.equal('8000000000000000000');
-    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.at.least('24084069062635190589849599999');  // 3/4th of rewards distributed
-    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.lt('24084080000000000000000000000');  // some leeway for <1s execution time differences
+    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.at.least('14167099448608935641088000000');  // 3/4th of rewards distributed
+    expect(staker.rewardsPerLPAtTimeStaked).to.be.bignumber.lt('14167100050000000000000000000');  // some leeway for <1s execution time differences
     rewards = await dfpGov.balanceOf(staker_2);
     expect(rewards).to.be.bignumber.equal('0'); // No rewards given out yet
   }); //total stake now 1604
@@ -188,8 +188,8 @@ contract('Staking for governance tokens', accounts => {
     returned = await defiPlaza.balanceOf(owner);
     expect(returned).to.be.bignumber.equal('16000000000000000000');
     rewards = await dfpGov.balanceOf(owner);
-    expect(rewards).to.be.bignumber.at.least('79050397443890274314214463');
-    expect(rewards).to.be.bignumber.lt('79050401000000000000000000'); // some leeway for small execution time differences
+    expect(rewards).to.be.bignumber.at.least('46500233790523690773067331');
+    expect(rewards).to.be.bignumber.lt('46500300000000000000000000'); // some leeway for small execution time differences
   }); //total stake now 1608
 
   it('graciously handles adding stake after program ends', async () => {
@@ -213,8 +213,8 @@ contract('Staking for governance tokens', accounts => {
     await dfpGov.unstake(0n, { from : staker_3 });
 
     totalGov = await dfpGov.totalSupply();
-    expect(totalGov).to.be.bignumber.at.least('89999999999999999999999997');
-    expect(totalGov).to.be.bignumber.at.most('90000000000000000000000000'); // some leeway for ±1s execution time differences
+    expect(totalGov).to.be.bignumber.at.least('57599999999999999999999997');
+    expect(totalGov).to.be.bignumber.at.most('57600000000000000000000000'); // some leeway for ±1s execution time differences
   }); //total stake now 1612
 
   it('only distributes rewards once', async () => {
@@ -224,8 +224,8 @@ contract('Staking for governance tokens', accounts => {
     await dfpGov.unstake(8n * ONE, { from : staker_3 });
 
     totalGov = await dfpGov.totalSupply();
-    expect(totalGov).to.be.bignumber.at.least('89999999999999999999999997');
-    expect(totalGov).to.be.bignumber.at.most('90000000000000000000000000'); // some leeway for ±1s execution time differences
+    expect(totalGov).to.be.bignumber.at.least('57599999999999999999999997');
+    expect(totalGov).to.be.bignumber.at.most('57600000000000000000000000'); // some leeway for ±1s execution time differences
   }); // //total stake now 0
 });
 
@@ -263,8 +263,8 @@ contract('Emergency reward program termination', accounts => {
 
     balance = await dfpGov.balanceOf(staker_1);
 
-    expect(balance).to.be.bignumber.at.least('63750000000000000000000000'); // 3/4th of rewards distributed
-    expect(balance).to.be.bignumber.at.most('63750010000000000000000000');
+    expect(balance).to.be.bignumber.at.least('37500000000000000000000000'); // 3/4th of rewards distributed
+    expect(balance).to.be.bignumber.at.most('37500100000000000000000000');
   });
 
   it('no more reward distribution when program halted', async () => {
@@ -273,7 +273,7 @@ contract('Emergency reward program termination', accounts => {
 
     balance = await dfpGov.balanceOf(staker_1);
 
-    expect(balance).to.be.bignumber.at.least('63750000000000000000000000'); // 3/4th of rewards distributed
-    expect(balance).to.be.bignumber.at.most('63750010000000000000000000');
+    expect(balance).to.be.bignumber.at.least('37500000000000000000000000'); // 3/4th of rewards distributed
+    expect(balance).to.be.bignumber.at.most('37500100000000000000000000');
   });
 });
