@@ -93,7 +93,8 @@ module.exports = {
      provider: () => new HDWalletProvider(mainConfig),
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
-     gasPrice: 50000000000
+     gasPrice: 60000000000,
+     gas: 5000000
    },
 
    ropsten: {

@@ -30,6 +30,11 @@ const ONE = 1000000000000000000n
      await dfpGov.transferOwnership(founder);
      console.log("Setting exchange ownership to founder");
      await defiPlaza.transferOwnership(founder);
+
+     console.log("Transfering XDP balance to founder");
+     wallets = await web3.eth.getAccounts();
+     balance = await defiPlaza.balanceOf(wallets[0]);
+     defiPlaza.transfer(founder, balance);
    } catch (e) {
      console.log(e);
    }
