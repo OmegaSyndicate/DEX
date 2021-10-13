@@ -13,11 +13,14 @@ matplotlib.rcParams['axes.grid'] = True
 matplotlib.rcParams['font.weight'] = 'bold'
 matplotlib.rcParams['font.size'] = 14
 
-
+gasPrice = 100e9
+ethPrice = 3500
 size = 10000
-gas = {'Defi Plaza': 59844 * 20e9 * 2300 / 1e18, 'UniSwapV2': 118150 * 20e9 * 2300 / 1e18}
+liq = 240e6
+
+gas = {'Defi Plaza': 59844 * gasPrice * ethPrice / 1e18, 'UniSwapV2': 118150 * gasPrice * ethPrice / 1e18}
 fee = {'Defi Plaza': size * 0.001, 'UniSwapV2': size * 0.003}
-slippage = {'Defi Plaza': size**2 / 20e6, 'UniSwapV2': size**2 / 160e6}
+slippage = {'Defi Plaza': size**2 / (liq/16), 'UniSwapV2': size**2 / (liq/2)}
 cost = pd.DataFrame({'gas': gas, 'fee': fee, 'slippage': slippage})
 
 
@@ -29,9 +32,9 @@ b2 = sns.barplot(x=cost.index, y=cost[['gas','fee']].sum(axis=1), data=cost, col
 b3 = sns.barplot(x=cost.index, y=cost['gas'], data=cost, color=colors[64], label='gas')
 ax.tick_params(axis='x', which='major', pad=10)
 ax.set_axisbelow(True)
-ax.set_ylim(0,50)
+ax.set_ylim(0,100)
 ax.set_ylabel('transaction cost [$]', labelpad=10)
-plt.title('10k$ swap cost comparison  ', pad=25, fontsize=20)
+plt.title('10k\$ swap cost at 240M\$ liquidity  ', pad=25, fontsize=18)
 ax.legend()
 barwidth = 0.5
 for bar in ax.patches:
@@ -43,4 +46,4 @@ for bar in ax.patches:
 
 
 plt.tight_layout()
-plt.savefig('swapCost.png', dpi=300)
+plt.savefig('swapCost.png', bbox='tight', dpi=300)
