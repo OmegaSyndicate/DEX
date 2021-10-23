@@ -9,7 +9,7 @@
   "author": "Jazzer9F",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/contracts": "^4.3.2",
     "@truffle/hdwallet-provider": "^1.4.0",
     "async": "^3.2.0",
     "fs": "*",

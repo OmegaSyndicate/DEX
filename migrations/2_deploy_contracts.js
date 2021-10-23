@@ -50,7 +50,7 @@ module.exports = function(deployer, network, accounts) {
         await deployer.deploy(TokenN);
         await deployer.deploy(TokenY);
         await deployer.deploy(TokenZ);
-        await deployer.deploy(DFPgov, accounts[5], 4000000n*ONE, 1633514400);
+        await deployer.deploy(DFPgov, accounts[5], 4000000n*ONE, 1641034800);  // Jan 1st 2022
         tokens = [TokenA.address.toLowerCase(), TokenB.address.toLowerCase(), TokenC.address.toLowerCase(),
           TokenD.address.toLowerCase(), TokenE.address.toLowerCase(), TokenF.address.toLowerCase(),
           TokenG.address.toLowerCase(), TokenH.address.toLowerCase(), TokenI.address.toLowerCase(),
