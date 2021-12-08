@@ -31,6 +31,8 @@ const mainMnemonic = process.env.MAIN_MNEMONIC;
 const mainForkURL = process.env.TRUFFLE_TEAMS_URL;
 const mainnetURL = process.env.MAINNET_URL;
 const ropstenURL = process.env.ROPSTEN_URL;
+const kovanURL = process.env.KOVAN_URL;
+const bsctestURL = process.env.BSCTEST_URL;
 const etherbaseKey = process.env.ETHERBASE_KEY;
 /*
 const ledgerOptions = {
@@ -46,10 +48,22 @@ mainForkConfig = {
   numberOfAddresses: 10,
   addressIndex: 0
 }
+bsctestConfig = {
+  mnemonic : mainMnemonic,
+  providerOrUrl : bsctestURL,
+  numberOfAddresses: 1,
+  addressIndex: 0
+}
+kovanConfig = {
+  mnemonic : mainMnemonic,
+  providerOrUrl : kovanURL,
+  numberOfAddresses: 1,
+  addressIndex: 0
+}
 ropstenConfig = {
-  mnemonic : mnemonicPhrase,
+  mnemonic : mainMnemonic,
   providerOrUrl : ropstenURL,
-  numberOfAddresses: 10,
+  numberOfAddresses: 1,
   addressIndex: 0
 }
 mainConfig = {
@@ -93,7 +107,7 @@ module.exports = {
      provider: () => new HDWalletProvider(mainConfig),
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: 1,
-     gasPrice: 40000000000,
+     gasPrice: 80000000000,
      gas: 5000000
    },
 
@@ -101,7 +115,33 @@ module.exports = {
      provider: () => new HDWalletProvider(ropstenConfig),
      //provider: () => new LedgerWalletProvider(ledgerOptions, ropstenURL),
      port: 7547,
+     maxFeePerGas: 200e9,
+     maxPriorityFeePerGas: 5e9,
+     //gasPrice: 100000000000,
+     gas: 1500000,
      network_id: 3,
+   },
+
+   kovan: {
+     provider: () => new HDWalletProvider(kovanConfig),
+     //provider: () => new LedgerWalletProvider(ledgerOptions, ropstenURL),
+     port: 7547,
+     maxFeePerGas: 200e9,
+     maxPriorityFeePerGas: 5e9,
+     //gasPrice: 100000000000,
+     gas: 1500000,
+     network_id: 42,
+   },
+
+   bsctest: {
+     provider: () => new HDWalletProvider(bsctestConfig),
+     //provider: () => new LedgerWalletProvider(ledgerOptions, ropstenURL),
+     port: 8545,
+     maxFeePerGas: 200e9,
+     maxPriorityFeePerGas: 5e9,
+     //gasPrice: 100000000000,
+     gas: 1500000,
+     network_id: 97,
    }
     // Another network with more advanced options...
     // advanced: {
